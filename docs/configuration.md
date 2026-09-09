@@ -86,11 +86,14 @@ has_label:
 
 ### `approval_count_at_least`
 
-Checks if the pull request has at least the specified number of approvals.
+Checks if the pull request has at least the specified number of approvals from reviewers with repository `write` or `admin` permission. Approvals from users with `read`, `triage`, or no repository permission do not count. GitHub maps
+the `maintain` base role to `write`, so maintainers count.
 
 ```yaml
 approval_count_at_least: 2
 ```
+
+If a reviewer permission cannot be verified, the action fails rather than counting that approval.
 
 ### `file_contains`
 

@@ -1,5 +1,7 @@
 import type { GitHubClient, PullRequestContext } from './github-context';
 
+const TRUSTED_APPROVAL_PERMISSIONS = new Set(['write', 'admin']);
+
 export async function countApprovals(
   client: GitHubClient,
   pullRequest: PullRequestContext,
@@ -18,5 +20,58 @@ export async function countApprovals(
     }
     states.set(login, review.state);
   }
-  return [...states.values()].filter((state) => state === 'APPROVED').length;
+
+  const approvedReviewers = [...states.entries()]
+    .filter(([, state]) => state === 'APPROVED')
+    .map(([login]) => login)
+    .sort();
+  let approvals = 0;
+
+  for (const username of approvedReviewers) {
+    const permission = await getReviewerPermission(
+      client,
+      pullRequest,
+      username,
+    );
+    if (TRUSTED_APPROVAL_PERMISSIONS.has(permission)) {
+      approvals += 1;
+    }
+  }
+
+  return approvals;
+}
+
+async function getReviewerPermission(
+  client: GitHubClient,
+  pullRequest: PullRequestContext,
+  username: string,
+): Promise<string> {
+  try {
+    const response = await client.rest.repos.getCollaboratorPermissionLevel({
+      owner: pullRequest.owner,
+      repo: pullRequest.repo,
+      username,
+    });
+    const permission: unknown = response.data.permission;
+    if (typeof permission !== 'string') {
+      throw new Error('GitHub returned an invalid repository permission.');
+    }
+    return permission;
+  } catch (error) {
+    if (isNotCollaboratorError(error)) {
+      return 'none';
+    }
+    throw new Error(
+      `Unable to verify repository permission for approved reviewer ${username}. Refusing to count the approval.`,
+    );
+  }
+}
+
+function isNotCollaboratorError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'status' in error &&
+    error.status === 404
+  );
 }

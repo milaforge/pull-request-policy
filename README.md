@@ -9,7 +9,7 @@ Define conditional rules for pull requests in YAML and enforce them automaticall
 
 GitHub branch protection can require approvals and passing checks. But it cannot easily express rules such as:
 
-> **If authentication code changes, require 2 approvals.**
+> **If authentication code changes, require 2 write-or-higher approvals.**
 
 > **If a workflow changes, require security review.**
 
@@ -21,7 +21,7 @@ That's what Pull Request Policy adds.
 
 | Capability                             | GitHub | Pull Request Policy |
 | -------------------------------------- | :----: | :-----------------: |
-| Require approvals                      |   ✅   |         ✅          |
+| Require trusted approvals              |   ✅   |         ✅          |
 | Require passing checks                 |   ✅   |          —          |
 | Rules based on changed files           |   ❌   |         ✅          |
 | Conditional approval requirements      |   ❌   |         ✅          |
@@ -41,7 +41,7 @@ policies:
       changed: ['src/auth/**']
     require:
       approval_count_at_least: 2
-    message: 'Auth changes require at least 2 approvals.'
+    message: 'Auth changes require at least 2 write-or-higher approvals.'
 
   - id: workflow-needs-security-review
     when:
@@ -91,15 +91,15 @@ Open a pull request. Violations are reported as annotations and `error` policies
 
 ## What can you check?
 
-| Predicate                 | Checks                  |
-| ------------------------- | ----------------------- |
-| `changed`                 | Changed files and paths |
-| `exists`                  | Files in the repository |
-| `title`                   | PR title                |
-| `body`                    | PR description          |
-| `has_label`               | PR labels               |
-| `approval_count_at_least` | Approvals               |
-| `file_contains`           | File contents           |
+| Predicate                 | Checks                    |
+| ------------------------- | ------------------------- |
+| `changed`                 | Changed files and paths   |
+| `exists`                  | Files in the repository   |
+| `title`                   | PR title                  |
+| `body`                    | PR description            |
+| `has_label`               | PR labels                 |
+| `approval_count_at_least` | Write-or-higher approvals |
+| `file_contains`           | File contents             |
 
 Combine predicates with `all`, `any`, and `not`, and use `when` for conditional policies.
 

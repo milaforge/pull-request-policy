@@ -6,6 +6,8 @@
 
 Policies are defined in YAML and can make requirements conditional on changed files, approvals, labels, PR titles, PR descriptions, and file contents.
 
+Approval-count policies only count current approvals from reviewers with repository `write` or `admin` permission. They complement, rather than replace, GitHub branch protection and CODEOWNERS.
+
 ## Why is it a GitHub Action instead of a bot?
 
 Pull Request Policy is designed for **zero-infrastructure policy enforcement**.

@@ -53,7 +53,7 @@ Push both files. The action will annotate violations and fail the job for `error
   message: 'Core or security changes must include tests.'
 ```
 
-### Require extra approvals for sensitive paths
+### Require extra trusted approvals for sensitive paths
 
 ```yaml
 - id: sensitive-paths-need-two-approvals
@@ -62,7 +62,7 @@ Push both files. The action will annotate violations and fail the job for `error
     changed: ['.github/workflows/**', 'infra/**', 'src/auth/**']
   require:
     approval_count_at_least: 2
-  message: 'Workflow, infra, and auth changes require 2 approvals.'
+  message: 'Workflow, infra, and auth changes require 2 write-or-higher approvals.'
 ```
 
 ### Allow an exemption label

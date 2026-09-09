@@ -138,7 +138,7 @@ function createSensitivePathsPresetState(): SensitivePathsPresetState {
     ],
     approvals: 2,
     message:
-      'Workflow, infra, auth, secrets, and deployment changes require at least 2 approvals.',
+      'Workflow, infra, auth, secrets, and deployment changes require at least 2 write-or-higher approvals.',
   };
 }
 

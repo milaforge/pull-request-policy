@@ -92,7 +92,7 @@ jobs:
     severity: error
     require:
       approval_count_at_least: 2
-    message: Workflow, infra, auth, secrets, and deployment changes require at least 2 approvals.
+    message: Workflow, infra, auth, secrets, and deployment changes require at least 2 write-or-higher approvals.
     when:
       changed:
         - .github/**
