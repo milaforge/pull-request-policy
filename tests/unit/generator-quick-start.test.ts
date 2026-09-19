@@ -43,6 +43,10 @@ jobs:
   it('builds exact yaml for each quick start preset', () => {
     const state = createDefaultQuickStartState();
     for (const preset of Object.values(state.presets)) preset.enabled = true;
+    state.presets['sensitive-paths'].globs = [
+      '.github/workflows/**',
+      'infra/**',
+    ];
     const policyMap = buildQuickStartPolicyMap(state);
 
     expect(generatePolicyYaml([policyMap['title-format']!])).toBe(`policies:
@@ -87,16 +91,11 @@ jobs:
     severity: error
     require:
       approval_count_at_least: 2
-    message: Workflow, infra, auth, secrets, and deployment changes require at least 2 write-or-higher approvals.
+    message: Sensitive path changes require at least 2 trusted approvals.
     when:
       changed:
-        - .github/**
         - .github/workflows/**
         - infra/**
-        - auth/**
-        - secrets/**
-        - deploy/**
-        - deployment/**
 `);
 
     expect(generatePolicyYaml([policyMap['release-safety']!])).toBe(`policies:
@@ -158,7 +157,6 @@ jobs:
       'title-format',
       'pr-body-required',
       'tests-for-source-changes',
-      'sensitive-paths',
       'release-safety',
     ]);
   });

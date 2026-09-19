@@ -83,7 +83,7 @@ export function buildQuickStartPolicyMap(
   }
 
   const sensitivePaths = state.presets['sensitive-paths'];
-  if (sensitivePaths.enabled) {
+  if (sensitivePaths.enabled && trimValues(sensitivePaths.globs).length > 0) {
     policies['sensitive-paths'] = createPolicy({
       id: 'sensitive-paths',
       severity: sensitivePaths.severity,

@@ -24,7 +24,22 @@ to express:
 Pull Request Policy runs inside your existing GitHub Actions workflow. It needs no
 bot, webhook server, database, GitHub App, or external service.
 
-## Quick start
+## Generate your policy
+
+[Open the policy generator](site/index.html), choose what you want to protect,
+copy the two generated files into your repository, and open a pull request. For
+sensitive paths, the generator asks which paths and how many trusted approvals
+your repository needs instead of guessing from generic directory names.
+
+The generated files are:
+
+- `.github/workflows/policy.yml` — runs the action on pull requests.
+- `.github/pull-request-policy.yml` — describes your selected protections.
+
+Configuration reference is secondary: use [Configuration Reference](docs/configuration.md)
+when you need rules beyond the generator’s starting points.
+
+## Manual quick start
 
 Add a workflow such as `.github/workflows/policy.yml`:
 

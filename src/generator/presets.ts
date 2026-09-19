@@ -128,18 +128,9 @@ function createSensitivePathsPresetState(): SensitivePathsPresetState {
   return {
     enabled: true,
     severity: 'error',
-    globs: [
-      '.github/**',
-      '.github/workflows/**',
-      'infra/**',
-      'auth/**',
-      'secrets/**',
-      'deploy/**',
-      'deployment/**',
-    ],
+    globs: [],
     approvals: 2,
-    message:
-      'Workflow, infra, auth, secrets, and deployment changes require at least 2 write-or-higher approvals.',
+    message: 'Sensitive path changes require at least 2 trusted approvals.',
   };
 }
 

@@ -53,4 +53,42 @@ describe('PolicyGeneratorApp', () => {
       'id: sensitive-paths',
     );
   });
+
+  it('asks for sensitive paths and approval count before generating that rule', () => {
+    new PolicyGeneratorApp(
+      globalThis.document.querySelector('#app') as HTMLElement,
+    ).initialize();
+    const checkbox = globalThis.document.querySelector(
+      '[data-preset-id="sensitive-paths"]',
+    ) as HTMLInputElement;
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+
+    expect(
+      globalThis.document.querySelector(
+        '[data-preset-field="sensitive-paths"]',
+      ),
+    ).toBeTruthy();
+    expect(globalThis.document.body.textContent).not.toContain(
+      'id: sensitive-paths',
+    );
+
+    const paths = globalThis.document.querySelector(
+      '[data-preset-field="sensitive-paths"]',
+    ) as HTMLInputElement;
+    paths.value = 'services/payments/**, infra/production/**';
+    paths.dispatchEvent(new Event('change', { bubbles: true }));
+    const approvals = globalThis.document.querySelector(
+      '[data-preset-field="sensitive-approvals"]',
+    ) as HTMLInputElement;
+    approvals.value = '3';
+    approvals.dispatchEvent(new Event('change', { bubbles: true }));
+
+    expect(globalThis.document.body.textContent).toContain(
+      'approval_count_at_least: 3',
+    );
+    expect(globalThis.document.body.textContent).toContain(
+      'services/payments/**',
+    );
+  });
 });

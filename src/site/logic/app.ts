@@ -45,6 +45,45 @@ export class PolicyGeneratorApp {
 
   private handleChange(event: Event): void {
     const target = event.target;
+    if (target instanceof HTMLInputElement && target.dataset.presetField) {
+      if (target.dataset.presetField === 'sensitive-paths') {
+        const values = target.value
+          .split(/[\n,]/)
+          .map((value) => value.trim())
+          .filter(Boolean);
+        this.state = {
+          presets: {
+            ...this.state.presets,
+            'sensitive-paths': {
+              ...this.state.presets['sensitive-paths'],
+              globs: values,
+              approvals: Number(
+                this.container.querySelector<HTMLInputElement>(
+                  '[data-preset-field="sensitive-approvals"]',
+                )?.value || 0,
+              ),
+            },
+          },
+        };
+        this.copiedTarget = null;
+        this.render();
+        return;
+      }
+      if (target.dataset.presetField === 'sensitive-approvals') {
+        this.state = {
+          presets: {
+            ...this.state.presets,
+            'sensitive-paths': {
+              ...this.state.presets['sensitive-paths'],
+              approvals: Number(target.value),
+            },
+          },
+        };
+        this.copiedTarget = null;
+        this.render();
+        return;
+      }
+    }
     const id =
       target instanceof HTMLInputElement ? target.dataset.presetId : undefined;
     if (!id || !isProtectionId(id)) return;
