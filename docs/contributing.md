@@ -3,20 +3,20 @@
 ## Local setup
 
 ```bash
-make install
+pnpm install
 ```
 
 ## Standard checks
 
 ```bash
-make lint
-make test
-make coverage
-make validate
-make build
+pnpm run lint
+pnpm run test
+pnpm run coverage
+pnpm run validate
+pnpm run build
 ```
 
-`make check` runs lint, formatting checks, typecheck, tests, coverage, and bundle generation.
+`pnpm run check` runs lint, formatting checks, typecheck, tests, coverage, and bundle generation.
 
 ## Release flow
 

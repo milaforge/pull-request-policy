@@ -30,12 +30,11 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "validate:config": "pnpm run compile && node scripts/validate-example-config.js",
-    "validate": "pnpm run validate:config",
+    "validate:example-config": "pnpm run compile && node scripts/validate-example-config.js",
+    "validate": "pnpm run validate:example-config",
     "check": "pnpm run lint:ci && pnpm run format:check && pnpm run typecheck && pnpm run test && pnpm run coverage && pnpm run build",
     "preview:site": "pnpm run build:site && node scripts/preview-site.mjs",
-    "prepare": "pnpm run build",
-    "release-dry-run": "pnpm run build && npm pack --dry-run"
+    "prepare": "pnpm run build"
   },
   "keywords": [
     "github action",
