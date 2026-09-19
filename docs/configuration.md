@@ -1,14 +1,16 @@
 # Configuration Reference
 
-The policy engine uses a YAML configuration file to define rules. By default, the action looks for `.github/pull-request-policy.yml`.
+The policy engine uses a YAML configuration file to define rules. By default, the action reads `.github/pull-request-policy.yml` from the pull request's base SHA, not from the checked-out PR workspace. A policy change therefore takes effect only after it merges.
 
 ## Action Inputs
 
-| Input          | Description                                | Default                           |
-| :------------- | :----------------------------------------- | :-------------------------------- |
-| `config-path`  | Optional path to a custom YAML policy file | `.github/pull-request-policy.yml` |
-| `github-token` | GitHub token for reading PR facts          | `${{ github.token }}`             |
-| `fail-on-warn` | Whether to fail the job on warn violations | `false`                           |
+| Input          | Description                                                              | Default                           |
+| :------------- | :----------------------------------------------------------------------- | :-------------------------------- |
+| `config-path`  | Optional repository-relative policy file path, read at the PR base SHA   | `.github/pull-request-policy.yml` |
+| `github-token` | GitHub token for reading the base policy, PR facts, and governance state | `${{ github.token }}`             |
+| `fail-on-warn` | Whether to fail the job on warn violations                               | `false`                           |
+
+To make the action a merge gate, protect the target branch, require this policy job’s status check, add CODEOWNERS for `.github/workflows/**`, the policy file, and CODEOWNERS itself, then require code-owner review. See [Quick Start](quick-start.md#3-make-it-a-merge-gate). The action emits advisory notices for a missing CODEOWNERS file, missing required status checks, and disabled code-owner review; it does not change repository settings.
 
 ## Root level
 

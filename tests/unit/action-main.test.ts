@@ -1,3 +1,5 @@
+import { Buffer } from 'node:buffer';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const reporter = {
@@ -68,11 +70,35 @@ describe('main', () => {
     process.env['RUNNER_TEMP'] = '/tmp';
 
     readInputs.mockReturnValue({ failOnWarn: false });
-    getOctokit.mockReturnValue({ client: true });
+    getOctokit.mockReturnValue({
+      rest: {
+        repos: {
+          getContent: vi.fn().mockResolvedValue({
+            data: {
+              type: 'file',
+              encoding: 'base64',
+              content: Buffer.from('policies: []\n').toString('base64'),
+            },
+          }),
+          getBranchProtection: vi.fn().mockResolvedValue({
+            data: {
+              required_status_checks: {
+                contexts: ['pull-request-policy / check'],
+              },
+              required_pull_request_reviews: {
+                require_code_owner_reviews: true,
+              },
+            },
+          }),
+        },
+      },
+    });
     requirePullRequestContext.mockReturnValue({
       owner: 'acme',
       repo: 'demo',
       number: 12,
+      baseSha: 'base-sha',
+      baseRef: 'main',
       title: 'Deploy change',
       body: 'Includes rollback guidance',
       labels: ['infra'],

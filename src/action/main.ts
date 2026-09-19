@@ -1,9 +1,19 @@
 import type { PolicyConfig } from '../config/schema';
-import { loadConfig, loadConfigFromPath } from '../config/load-config';
+import {
+  loadConfig,
+  loadConfigFromPath,
+  type LoadedConfig,
+} from '../config/load-config';
+import { DEFAULT_CONFIG_PATH } from '../config/default-config';
 import { evaluatePolicy } from '../engine/evaluate-policy';
 import { collectPolicyFacts } from '../facts/collect-facts';
-import { type PolicyFacts } from '../facts/github-context';
+import {
+  requirePullRequestContext,
+  type PolicyFacts,
+} from '../facts/github-context';
 
+import { loadConfigFromBase } from './base-config';
+import { collectGovernanceNotices } from './governance-advisory';
 import { readInputs, type ActionInputs } from './inputs';
 import { createGitHubReporter, type ActionReporter } from './reporter';
 import * as github from '@actions/github';
@@ -20,6 +30,8 @@ export interface ActionDependencies {
   factsProvider: (config: PolicyConfig) => Promise<PolicyFacts>;
   cwd?: string | undefined;
   runnerTemp?: string | undefined;
+  configLoader?: (() => Promise<LoadedConfig>) | undefined;
+  governanceNotices?: string[] | undefined;
 }
 
 /**
@@ -29,7 +41,10 @@ export async function runAction(
   dependencies: ActionDependencies,
 ): Promise<ActionRunResult> {
   const loaded = await readConfig(dependencies);
-  for (const notice of loaded.notices) {
+  for (const notice of [
+    ...loaded.notices,
+    ...(dependencies.governanceNotices ?? []),
+  ]) {
     dependencies.reporter.notice(notice);
   }
 
@@ -67,6 +82,9 @@ export async function runAction(
 async function readConfig(
   dependencies: ActionDependencies,
 ): Promise<Awaited<ReturnType<typeof loadConfig>>> {
+  if (dependencies.configLoader !== undefined) {
+    return dependencies.configLoader();
+  }
   const configPath = dependencies.inputs.configPath;
   if (configPath !== undefined) {
     return loadConfigFromPath(configPath);
@@ -127,19 +145,29 @@ export async function main(): Promise<void> {
 
   try {
     const workspace = process.env['GITHUB_WORKSPACE'] ?? process.cwd();
+    const token = inputs.githubToken ?? process.env['GITHUB_TOKEN'];
+    if (!token?.trim()) {
+      throw new Error('github-token input is required for pull request facts.');
+    }
+    const client = github.getOctokit(token);
+    const pullRequest = requirePullRequestContext(github.context);
+    const governanceNotices = await collectGovernanceNotices(
+      client,
+      pullRequest,
+    );
     const dependencies: ActionDependencies = {
       inputs,
       reporter,
       cwd: workspace,
       runnerTemp: process.env['RUNNER_TEMP'],
+      governanceNotices,
+      configLoader: () =>
+        loadConfigFromBase(
+          client,
+          pullRequest,
+          inputs.configPath ?? DEFAULT_CONFIG_PATH,
+        ),
       factsProvider: async (config) => {
-        const token = inputs.githubToken ?? process.env['GITHUB_TOKEN'];
-        if (!token?.trim()) {
-          throw new Error(
-            'github-token input is required for pull request facts.',
-          );
-        }
-        const client = github.getOctokit(token);
         return collectPolicyFacts(client, config, workspace);
       },
     };

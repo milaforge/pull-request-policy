@@ -1,12 +1,13 @@
 # How It Works
 
-`pull-request-policy` runs as a GitHub Action on every pull request. It loads a YAML policy file, collects the PR facts those policies need, evaluates the rules, and reports results as CI annotations.
+`pull-request-policy` runs as a GitHub Action on every pull request. It loads the YAML policy file from the pull request's base SHA, collects the PR facts those policies need, evaluates the rules, and reports results as CI annotations.
 
 ## Evaluation flow
 
 ```mermaid
 graph TD
-    PR[Pull Request] --> Config[Load pull-request-policy.yml]
+    Base[Trusted base SHA] --> Config[Load pull-request-policy.yml]
+    PR[Pull Request] --> Facts[Collect PR facts]
     Config --> Facts[Collect Facts]
     Facts --> Engine[Evaluate Policies]
     Engine --> CI[Annotations + Job Result]

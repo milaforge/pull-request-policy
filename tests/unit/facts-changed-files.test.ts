@@ -19,6 +19,8 @@ describe('listChangedFiles', () => {
         owner: 'acme',
         repo: 'demo',
         number: 7,
+        baseSha: 'base-sha',
+        baseRef: 'main',
         title: '',
         body: '',
         labels: [],

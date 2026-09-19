@@ -10,7 +10,7 @@ inputs:
     required: false
     default: .github/pull-request-policy.yml
   github-token:
-    description: GitHub token used to read pull request facts.
+    description: GitHub token used to read the base policy, pull request facts, and governance state.
     required: false
     default: ${{ github.token }}
   fail-on-warn:
