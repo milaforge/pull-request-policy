@@ -1,4 +1,9 @@
 import type { WorkflowOptions } from './types';
+import {
+  CHECKOUT_ACTION_REFERENCE,
+  POLICY_ACTION_SHA,
+  POLICY_ACTION_VERSION,
+} from './action-refs';
 
 function appendLine(lines: string[], level: number, value: string): void {
   lines.push(`${'  '.repeat(level)}${value}`);
@@ -15,11 +20,17 @@ export function generateWorkflowYaml(options: WorkflowOptions): string {
   appendLine(lines, 3, 'contents: read');
   appendLine(lines, 3, 'pull-requests: read');
   appendLine(lines, 2, 'steps:');
-  appendLine(lines, 3, '- uses: actions/checkout@v4');
+  appendLine(lines, 3, `- uses: ${CHECKOUT_ACTION_REFERENCE}`);
+  appendLine(lines, 4, 'with:');
+  appendLine(lines, 5, 'persist-credentials: false');
   appendLine(
     lines,
     3,
-    `- uses: milaforge/pull-request-policy@${options.actionRef}`,
+    `- uses: milaforge/pull-request-policy@${options.actionRef}${
+      options.actionRef === POLICY_ACTION_SHA
+        ? ` # ${POLICY_ACTION_VERSION}`
+        : ''
+    }`,
   );
 
   if (

@@ -11,6 +11,7 @@ import type {
   TitleFormatPresetState,
   WorkflowOptions,
 } from './types';
+import { POLICY_ACTION_SHA } from './action-refs';
 
 export interface QuickStartPresetMeta {
   id: QuickStartPresetId;
@@ -88,7 +89,7 @@ export const QUICK_START_PRESET_META: Record<
 
 export function createDefaultWorkflowOptions(): WorkflowOptions {
   return {
-    actionRef: '0.1-beta',
+    actionRef: POLICY_ACTION_SHA,
     failOnWarn: false,
     configPath: '.github/pull-request-policy.yml',
   };

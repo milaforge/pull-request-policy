@@ -9,6 +9,7 @@ module.exports = [
       '**/coverage/**',
       '**/node_modules/**',
       '**/build/**',
+      'site-dist/**',
     ],
   },
   {

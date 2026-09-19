@@ -23,7 +23,7 @@
     "compile": "tsc --outDir build",
     "lint": "mkdir -p build && eslint src tests scripts eslint.config.cjs",
     "lint:ci": "mkdir -p build && eslint src tests scripts eslint.config.cjs --max-warnings=0",
-    "lint-fix": "eslint . --fix",
+    "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "test": "vitest run",
@@ -49,7 +49,7 @@
     "pull request policy",
     "github ci"
   ],
-  "author": "",
+  "author": "milaforge",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

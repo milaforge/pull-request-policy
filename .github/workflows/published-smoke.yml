@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
-      - uses: milaforge/pull-request-policy@0.1-beta
+      - uses: milaforge/pull-request-policy@025b7c153194f0712f91809bfada9fce35057c46 # v0.1-beta
         with:
           github-token: ${{ github.token }}
           config-path: tests/fixtures/self-test/pass.yml
@@ -34,7 +34,7 @@ jobs:
           persist-credentials: false
       - id: pull-request-policy
         continue-on-error: true
-        uses: milaforge/pull-request-policy@0.1-beta
+        uses: milaforge/pull-request-policy@025b7c153194f0712f91809bfada9fce35057c46 # v0.1-beta
         with:
           github-token: ${{ github.token }}
           config-path: tests/fixtures/self-test/fail.yml
