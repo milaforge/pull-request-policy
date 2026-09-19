@@ -9,28 +9,22 @@ import type { ActionReporter } from '../../src/action/reporter';
 import { createFacts } from '../helpers/facts';
 
 describe('runAction', () => {
-  it('uses the temporary default config in advisory mode when config is missing', async () => {
+  it('fails with onboarding instructions when config is missing', async () => {
     const workspace = await fs.mkdtemp(
       path.join(os.tmpdir(), 'pull-request-policy-action-'),
     );
-    const runnerTemp = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'pull-request-policy-runner-'),
-    );
-    const notices: string[] = [];
+    const failures: string[] = [];
 
-    const result = await runAction({
-      inputs: { failOnWarn: false },
-      cwd: workspace,
-      runnerTemp,
-      reporter: createReporter({ notices }),
-      factsProvider: () => Promise.resolve(createFacts()),
-    });
-
-    expect(result.advisoryOnly).toBe(true);
-    expect(notices.join('\n')).toMatch(/Generated.*advisory/i);
+    await expect(
+      runAction({
+        inputs: { failOnWarn: false },
+        cwd: workspace,
+        reporter: createReporter({ failures }),
+        factsProvider: () => Promise.resolve(createFacts()),
+      }),
+    ).rejects.toThrow(/No policy configuration found/i);
 
     await fs.rm(workspace, { recursive: true, force: true });
-    await fs.rm(runnerTemp, { recursive: true, force: true });
   });
 
   it('fails the run when an error severity policy is violated', async () => {

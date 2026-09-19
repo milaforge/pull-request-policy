@@ -32,9 +32,12 @@ You can use another policy file by setting the `config-path` input.
 
 ## What happens if the policy file is missing?
 
-The action runs in **advisory mode** when no configuration is found. It generates a temporary configuration and does not unexpectedly block pull requests.
+The action fails loudly when no configuration is found. Copy
+`.github/pull-request-policy.yml.example` to `.github/pull-request-policy.yml`,
+customize it for the repository, commit it, and open a new pull request.
 
-This makes it possible to introduce the action without immediately breaking existing workflows.
+An existing configuration can still use `warn` policies for a gradual rollout.
+Warnings are reported without failing the job unless `fail-on-warn: true` is set.
 
 ## Does it read the whole repository?
 

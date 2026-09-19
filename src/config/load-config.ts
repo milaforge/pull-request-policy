@@ -1,13 +1,8 @@
 import { promises as fs } from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import yaml from 'js-yaml';
 
-import {
-  DEFAULT_CONFIG_PATH,
-  createDefaultPolicyConfig,
-  renderDefaultPolicyConfig,
-} from './default-config';
+import { DEFAULT_CONFIG_PATH } from './default-config';
 import type { PolicyConfig } from './schema';
 import { validateConfig } from './validate-config';
 
@@ -34,8 +29,11 @@ export async function loadConfig(
   try {
     await fs.access(resolvedPath);
     return loadConfigFromPath(resolvedPath);
-  } catch {
-    return createTemporaryDefaultConfig(options);
+  } catch (error) {
+    if (isMissingFileError(error)) {
+      throw createMissingConfigError(DEFAULT_CONFIG_PATH);
+    }
+    throw error;
   }
 }
 
@@ -44,6 +42,13 @@ export async function loadConfigFromPath(
 ): Promise<LoadedConfig> {
   const resolvedPath = path.resolve(configPath);
   const source = await fs.readFile(resolvedPath, 'utf8');
+  return loadConfigFromSource(source, resolvedPath);
+}
+
+export function loadConfigFromSource(
+  source: string,
+  resolvedPath: string,
+): LoadedConfig {
   const parsed = yaml.load(source);
   return {
     config: validateConfig(parsed),
@@ -54,20 +59,17 @@ export async function loadConfigFromPath(
   };
 }
 
-async function createTemporaryDefaultConfig(
-  options: LoadConfigOptions,
-): Promise<LoadedConfig> {
-  const tempRoot =
-    options.runnerTemp ?? process.env['RUNNER_TEMP'] ?? os.tmpdir();
-  const resolvedPath = path.join(tempRoot, 'pull-request-policy.default.yml');
-  await fs.writeFile(resolvedPath, renderDefaultPolicyConfig(), 'utf8');
-  return {
-    config: createDefaultPolicyConfig(),
-    advisoryOnly: true,
-    generatedDefault: true,
-    resolvedPath,
-    notices: [
-      `No config found at ${DEFAULT_CONFIG_PATH}. Generated an advisory-only default config at ${resolvedPath}.`,
-    ],
-  };
+export function createMissingConfigError(configPath: string): Error {
+  return new Error(
+    `No policy configuration found at ${configPath}. Copy .github/pull-request-policy.yml.example to ${DEFAULT_CONFIG_PATH}, customize it, and commit it before opening a pull request. See https://github.com/milaforge/pull-request-policy#quick-start.`,
+  );
+}
+
+function isMissingFileError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'ENOENT'
+  );
 }

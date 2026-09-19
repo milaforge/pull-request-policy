@@ -15,7 +15,7 @@ graph LR
 
 ## Flow
 
-1. **Load and Validate**: Load YAML config and validate against the schema. If missing, generate an advisory-only fallback.
+1. **Load and Validate**: Load YAML config and validate against the schema. If missing, fail with copy-and-customize onboarding instructions.
 2. **Gather Facts**: Collect pull request facts (labels, files, etc.) and only the repository facts (file existence/content) required by the config.
 3. **Pure Evaluation**: Evaluate policies using pure functions. The engine combines predicates and combinators deterministically.
 4. **Report**: Emit GitHub annotations, warnings, errors, and a log summary.
@@ -33,4 +33,4 @@ graph LR
 - **Pure Engine**: The core evaluation logic has no side effects and is easily testable.
 - **Minimal Footprint**: No external dependencies beyond the GitHub context and the local workspace.
 - **Low Noise**: Only reads repository files if explicitly requested by a policy.
-- **Advisory Fallback**: Never breaks a build due to a missing configuration file.
+- **Explicit Configuration**: Never silently runs an unenforced policy when the configuration file is missing.

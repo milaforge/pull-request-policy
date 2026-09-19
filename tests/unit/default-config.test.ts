@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG_PATH } from '../../src/config/default-config';
 import { loadConfig } from '../../src/config/load-config';
 
-describe('loadConfig fallback', () => {
+describe('loadConfig', () => {
   const originalCwd = process.cwd();
   const originalRunnerTemp = process.env['RUNNER_TEMP'];
 
@@ -20,25 +20,13 @@ describe('loadConfig fallback', () => {
     }
   });
 
-  it('uses a temporary advisory-only default when config is missing', async () => {
+  it('fails with onboarding instructions when config is missing', async () => {
     const workspace = await fs.mkdtemp(
       path.join(os.tmpdir(), 'pull-request-policy-workspace-'),
     );
-    const runnerTemp = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'pull-request-policy-runner-'),
-    );
-
     process.chdir(workspace);
-    process.env['RUNNER_TEMP'] = runnerTemp;
-
-    const loaded = await loadConfig();
-
-    expect(loaded.generatedDefault).toBe(true);
-    expect(loaded.advisoryOnly).toBe(true);
-    expect(loaded.resolvedPath.startsWith(runnerTemp)).toBe(true);
-    expect(loaded.notices[0]).toContain(DEFAULT_CONFIG_PATH);
-    await expect(fs.readFile(loaded.resolvedPath, 'utf8')).resolves.toContain(
-      'policies:',
+    await expect(loadConfig()).rejects.toThrow(
+      new RegExp(`No policy configuration found at ${DEFAULT_CONFIG_PATH}`),
     );
   });
 });
