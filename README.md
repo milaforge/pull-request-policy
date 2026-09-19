@@ -73,9 +73,11 @@ policies:
     approvals: 2
 ```
 
-Open a pull request. The action reports violations as check annotations and fails
-the job for `error` policies. To make that result block merges, require the policy
-job in your branch protection or ruleset. See [Quick Start](docs/quick-start.md)
+Open a pull request. The generated workflow starts in `audit` mode: it evaluates
+everything and reports violations without failing, so you can inspect one real PR
+before changing the workflow input to `mode: enforce`. In enforce mode, the action
+fails the job for `error` policies. To make that result block merges, require the
+policy job in your branch protection or ruleset. See [Quick Start](docs/quick-start.md)
 for the merge-gate setup.
 
 The action failing and GitHub blocking a merge are separate things: a failed job
@@ -112,7 +114,7 @@ descriptions.
 - **No policy configuration found** — Copy `.github/pull-request-policy.yml.sample` to `.github/pull-request-policy.yml`, customize it, commit it, and open a new pull request.
 - **The check failed but the PR can still merge** — Require the exact `PR Policy / policy` status check in branch protection or a ruleset.
 - **An approval was not counted** — Only current approvals from trusted repository collaborators count. See the [FAQ](docs/faq.md#which-approvals-count).
-- **Warnings appear but the job passes** — Start with `warn` policies for testing, then use `error` or set `fail-on-warn: true` when ready to enforce.
+- **I want to trial the policy safely** — Set `mode: audit` to report all violations without failing; switch to `mode: enforce` after reviewing a real PR.
 - **The action says it needs a pull request** — Use a `pull_request` workflow; push-only workflows are not supported in v1.
 
 ## Security boundaries

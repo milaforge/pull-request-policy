@@ -61,6 +61,7 @@ export async function runAction(
       errorViolations,
       warningViolations,
       dependencies.inputs.failOnWarn,
+      dependencies.inputs.mode,
     )
   ) {
     dependencies.reporter.fail(createFailureMessage(evaluations));
@@ -116,7 +117,9 @@ function shouldFail(
   errorViolations: number,
   warningViolations: number,
   failOnWarn: boolean,
+  mode: ActionInputs['mode'],
 ): boolean {
+  if (mode === 'audit') return false;
   return errorViolations > 0 || (failOnWarn && warningViolations > 0);
 }
 

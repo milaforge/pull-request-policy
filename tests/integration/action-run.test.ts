@@ -17,7 +17,7 @@ describe('runAction', () => {
 
     await expect(
       runAction({
-        inputs: { failOnWarn: false },
+        inputs: { failOnWarn: false, mode: 'enforce' },
         cwd: workspace,
         reporter: createReporter({ failures }),
         factsProvider: () => Promise.resolve(createFacts()),
@@ -46,6 +46,7 @@ policies:
       inputs: {
         configPath: path.join(workspace, '.github/pull-request-policy.yml'),
         failOnWarn: false,
+        mode: 'enforce',
       },
       reporter: createReporter({ failures }),
       factsProvider: () => Promise.resolve(createFacts()),
@@ -75,6 +76,7 @@ policies:
       inputs: {
         configPath: path.join(workspace, '.github/pull-request-policy.yml'),
         failOnWarn: false,
+        mode: 'enforce',
       },
       reporter: createReporter({ failures, warnings }),
       factsProvider: () => Promise.resolve(createFacts()),
@@ -85,6 +87,31 @@ policies:
     expect(warnings[0]).toMatch(
       /API changes should include release-note evidence/i,
     );
+  });
+
+  it('reports error violations without failing in audit mode', async () => {
+    const workspace = await createWorkspaceWithConfig(`
+policies:
+  - id: required-tests
+    severity: error
+    require:
+      changed: tests/**
+    message: Tests are required.
+`);
+    const failures: string[] = [];
+
+    const result = await runAction({
+      inputs: {
+        configPath: path.join(workspace, '.github/pull-request-policy.yml'),
+        failOnWarn: true,
+        mode: 'audit',
+      },
+      reporter: createReporter({ failures }),
+      factsProvider: () => Promise.resolve(createFacts()),
+    });
+
+    expect(result.errorViolations).toBe(1);
+    expect(failures).toEqual([]);
   });
 });
 

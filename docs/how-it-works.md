@@ -18,7 +18,7 @@ For each policy:
 - If `when` is defined and does not match → **skip**
 - If `when` matches (or is absent), evaluate `require`:
   - passes → ✓
-  - fails → violation (annotated; job fails for `error` severity)
+  - fails → violation (annotated; audit reports it, enforce fails for `error` severity)
 
 ## Policy structure
 
@@ -62,6 +62,13 @@ require:
 
 - `error` — fails CI
 - `warn` — annotates PR, does not fail (unless `fail-on-warn: true`)
+
+## Trial mode
+
+`mode: audit` evaluates every policy and reports violations, but never fails the
+job. The default `mode: enforce` preserves normal severity and `fail-on-warn`
+behavior. A practical rollout is: generate, run in audit mode, inspect one real
+PR, switch to enforce, then require the check in branch protection.
 
 ---
 

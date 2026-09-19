@@ -59,7 +59,7 @@ describe('main', () => {
     process.env['GITHUB_TOKEN'] = 'token';
     process.env['RUNNER_TEMP'] = '/tmp';
 
-    readInputs.mockReturnValue({ failOnWarn: false });
+    readInputs.mockReturnValue({ failOnWarn: false, mode: 'enforce' });
     getOctokit.mockReturnValue({
       rest: {
         repos: {
@@ -115,7 +115,7 @@ describe('main', () => {
   });
 
   it('fails cleanly when no GitHub token is available', async () => {
-    readInputs.mockReturnValue({ failOnWarn: false });
+    readInputs.mockReturnValue({ failOnWarn: false, mode: 'enforce' });
 
     const { main } = await import('../../src/action/main');
     await main();

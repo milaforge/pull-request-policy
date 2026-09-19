@@ -92,6 +92,7 @@ export function createDefaultWorkflowOptions(): WorkflowOptions {
     actionRef: POLICY_ACTION_SHA,
     failOnWarn: false,
     configPath: '.github/pull-request-policy.yml',
+    mode: 'audit',
   };
 }
 

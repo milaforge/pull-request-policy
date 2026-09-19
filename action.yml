@@ -17,6 +17,10 @@ inputs:
     description: Fail the job when warning policies are violated.
     required: false
     default: 'false'
+  mode:
+    description: audit reports violations without failing; enforce fails according to policy severity.
+    required: false
+    default: enforce
 runs:
   using: node20
   main: dist/index.js

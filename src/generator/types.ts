@@ -10,6 +10,7 @@ export interface WorkflowOptions {
   actionRef: string;
   failOnWarn: boolean;
   configPath: string;
+  mode: 'audit' | 'enforce';
 }
 
 export type QuickStartPresetId =
