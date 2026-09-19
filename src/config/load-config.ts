@@ -61,7 +61,7 @@ export function loadConfigFromSource(
 
 export function createMissingConfigError(configPath: string): Error {
   return new Error(
-    `No policy configuration found at ${configPath}. Copy .github/pull-request-policy.yml.example to ${DEFAULT_CONFIG_PATH}, customize it, and commit it before opening a pull request. See https://github.com/milaforge/pull-request-policy#quick-start.`,
+    `No policy configuration found at ${configPath}. Copy .github/pull-request-policy.yml.sample to ${DEFAULT_CONFIG_PATH}, customize it, and commit it before opening a pull request. See https://github.com/milaforge/pull-request-policy#quick-start.`,
   );
 }
 

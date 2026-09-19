@@ -1,5 +1,5 @@
-# pull-request-policy example configuration
-# Copy this file to .github/pull-request-policy.yml and adapt the policies you need.
+# pull-request-policy sample configuration
+# Copy this file to your .github/pull-request-policy.yml and adapt the policies you need.
 
 policies:
   - id: queue-change-requires-tests
@@ -7,29 +7,29 @@ policies:
     severity: error
     when:
       changed:
-        - "runtime/queue/**"
-        - "runtime/store/**"
+        - 'runtime/queue/**'
+        - 'runtime/store/**'
     require:
       any:
         - changed:
-            - "tests/**"
+            - 'tests/**'
         - changed:
-            - "failure_modes/**"
-    message: "Queue/store changes require tests or failure-mode updates."
+            - 'failure_modes/**'
+    message: 'Queue/store changes require tests or failure-mode updates.'
 
   - id: public-api-change-needs-changelog
     description: Public API changes require a changelog update or exemption label.
     severity: warn
     when:
       changed:
-        - "api/public/**"
+        - 'api/public/**'
     require:
       any:
         - changed:
-            - "CHANGELOG.md"
+            - 'CHANGELOG.md'
         - has_label:
-            - "release-note-exempt"
-    message: "Public API changes should include a changelog update or exemption label."
+            - 'release-note-exempt'
+    message: 'Public API changes should include a changelog update or exemption label.'
 
 # Feature examples
 #

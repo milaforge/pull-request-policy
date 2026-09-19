@@ -48,7 +48,7 @@ jobs:
 
 Then create `.github/pull-request-policy.yml`:
 
-Copy `.github/pull-request-policy.yml.example` as a starting point, then remove
+Copy `.github/pull-request-policy.yml.sample` as a starting point, then remove
 or customize the example policies for your repository. The action fails loudly if
 this file is missing; it never silently treats an unconfigured repository as
 protected.
@@ -99,7 +99,7 @@ descriptions.
 
 ## Troubleshooting
 
-- **No policy configuration found** — Copy `.github/pull-request-policy.yml.example` to `.github/pull-request-policy.yml`, customize it, commit it, and open a new pull request.
+- **No policy configuration found** — Copy `.github/pull-request-policy.yml.sample` to `.github/pull-request-policy.yml`, customize it, commit it, and open a new pull request.
 - **The check failed but the PR can still merge** — Require this workflow's exact status check in branch protection or a ruleset.
 - **An approval was not counted** — Only current approvals from trusted repository collaborators count. See the [FAQ](docs/faq.md#which-approvals-count).
 - **Warnings appear but the job passes** — Start with `warn` policies for testing, then use `error` or set `fail-on-warn: true` when ready to enforce.

@@ -56,7 +56,7 @@ This defines *what to optimize*, not *what is allowed*.
 If `.github/pull-request-policy.yml` is missing:
 
 - fail CI loudly with a clear, actionable message;
-- tell the user to copy `.github/pull-request-policy.yml.example`;
+- tell the user to copy `.github/pull-request-policy.yml.sample`;
 - tell the user to customize and commit `.github/pull-request-policy.yml`;
 - link to the Quick Start documentation.
 
