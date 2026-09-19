@@ -121,6 +121,7 @@ bypass GitHub governance rules.
 - [Policy Examples](docs/policy-examples.md) — common rules to adapt
 - [How It Works](docs/how-it-works.md) — evaluation flow and data sources
 - [Architecture](docs/architecture.md) — implementation and design constraints
+- [Roadmap](docs/roadmap.md) — planned dependency-impact policies for v2
 
 ## License
 
