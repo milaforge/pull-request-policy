@@ -17,8 +17,10 @@ jobs:
       contents: read
       pull-requests: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: milaforge/pull-request-policy@0.1-beta
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: milaforge/pull-request-policy@025b7c153194f0712f91809bfada9fce35057c46 # v0.1-beta
 ```
 
 ## 2. Add the policy file
@@ -36,6 +38,25 @@ policies:
 ```
 
 Push both files. The action will annotate violations and fail the job for `error`-severity rules.
+
+## 3. Make it a merge gate
+
+This is a repository-admin setup step. The Action can fail its workflow job, but a failed job is not automatically a merge restriction. For example, if a PR title violates the `severity: error` policy, GitHub will show the policy job as **failing** and annotate the PR. If the target branch has no rule requiring that job to pass, a user who has permission to merge can still click **Merge** (or merge through the API); the failure is informational rather than a gate.
+
+1. In **Settings → Rules**, protect the branch that receives PRs (for example, `main`). Require the exact status check produced by this policy job. GitHub then evaluates the check as part of the branch rule: while the policy job is failing, the PR is not mergeable through the normal GitHub merge path; if the job has not completed, it is also blocked as a required check. The rule therefore turns the Action's result into a GitHub-enforced merge condition. Accounts or teams granted an explicit branch-rule bypass can still bypass that condition, so review your bypass list as part of the repository's governance.
+2. Add `.github/CODEOWNERS`:
+
+   ```text
+   /.github/workflows/ @repo-owner
+   /.github/pull-request-policy.yml @repo-owner
+   /.github/CODEOWNERS @repo-owner
+   ```
+
+3. In the same branch rule, enable **Require review from Code Owners**.
+
+Use the GitHub account or team that should approve governance changes in place of `@repo-owner`. Public repositories can use these controls on GitHub Free. Private repositories still receive the action's base-SHA protection, but GitHub may require a paid plan to enforce branch protection and code-owner review.
+
+The action emits advisory CI notices when it cannot find a CODEOWNERS file, required status checks are absent, or required code-owner review is disabled. It cannot verify which specific job is selected as a required check or whether CODEOWNERS patterns cover every protected path; confirm those in the branch-rule UI.
 
 ---
 

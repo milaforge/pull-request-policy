@@ -8,6 +8,18 @@ Policies are defined in YAML and can make requirements conditional on changed fi
 
 Approval-count policies only count current approvals from reviewers with repository `write` or `admin` permission. They complement, rather than replace, GitHub branch protection and CODEOWNERS.
 
+## How does it complement GitHub branch protection and CODEOWNERS?
+
+GitHub branch protection and rulesets enforce repository-wide requirements such as
+passing checks, required approvals, and restrictions on who can merge. CODEOWNERS
+assigns review responsibility for protected paths. Pull Request Policy adds
+conditional rules that depend on the pull request's changed files and metadata.
+
+For example, branch protection can require the policy check to pass, CODEOWNERS can
+protect `.github/workflows/**`, and this action can require an additional label or
+approval count when those paths change. The action does not configure or replace
+any GitHub governance setting.
+
 ## Why is it a GitHub Action instead of a bot?
 
 Pull Request Policy is designed for **zero-infrastructure policy enforcement**.
@@ -55,6 +67,17 @@ Policies have either `error` or `warn` severity.
 
 Violations are reported as pull request annotations.
 
+## Which approvals count?
+
+Only current approvals from reviewers with repository `write` or `admin` permission
+count toward `approval_count_at_least`. GitHub's `maintain` role is treated as
+`write`; read, triage, and unknown permissions do not count.
+
+The action verifies each reviewer's repository permission through the GitHub API.
+If GitHub returns an unexpected error while checking permission, the action fails
+closed instead of treating the approval as trusted. A GitHub approval by itself is
+not equivalent to a trusted approval.
+
 ## What permissions does it need?
 
 The recommended permissions are:
@@ -66,6 +89,11 @@ permissions:
 ```
 
 These provide the read access required to evaluate pull request metadata and repository files.
+
+The action is intended to run on `pull_request` events. It requires a pull request
+context and is not a general-purpose check for `push` workflows. The checkout step
+should use `persist-credentials: false` unless the workflow has a separate reason
+to retain credentials.
 
 ## Can I combine multiple conditions?
 
@@ -93,9 +121,35 @@ Its purpose is to enforce **conditional repository policies based on pull reques
 
 ## Can I test policies locally?
 
-Yes.
+Yes. Contributors can install dependencies and run the repository checks locally.
+See [Contributing](contributing.md) for the development and validation commands.
 
-See the [Local Development](../README.md#local-development) documentation for instructions on running the test suite and evaluating policies locally.
+Consumer policies are evaluated against real GitHub pull request facts, so the
+most representative test is a pull request using a temporary `warn` policy before
+changing rules to `error`.
+
+## What happens when GitHub data cannot be verified?
+
+The action fails closed when required facts cannot be trusted. For example, if a
+reviewer's repository permission cannot be verified, that approval is not counted;
+an unexpected GitHub API error fails the action rather than silently passing the
+policy. This protects approval-based rules from incomplete authorization data.
+
+## Can I use it without a paid GitHub plan?
+
+The action itself does not require a paid plan and its base-commit policy protection
+works without CODEOWNERS or branch protection. Public repositories can use GitHub's
+available branch protection and code-owner controls on GitHub Free. Private-repository
+availability of particular governance features depends on the repository's GitHub
+plan. Check GitHub's current plan limits before relying on a specific ruleset or
+code-owner feature.
+
+## What if a user has permission to bypass the rules?
+
+The action can fail its check and GitHub can require that check for normal merges,
+but repository administrators or explicitly permitted bypass actors may still be
+able to bypass branch rules. Review the repository's bypass list when the policy is
+part of a security or release control.
 
 ## Is it a security scanner?
 
