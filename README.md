@@ -1,63 +1,32 @@
-# Pull Request Policy
+# GitHub Pull Request Policy as Code
 
 [![CI](https://github.com/milaforge/pull-request-policy/actions/workflows/ci.yml/badge.svg)](https://github.com/milaforge/pull-request-policy/actions/workflows/ci.yml)
 [![Marketplace](https://img.shields.io/badge/GitHub-Marketplace-blue.svg)](https://github.com/marketplace/actions/pull-request-policy)
 
-**Policy as Code for GitHub Pull Requests.**
+Pull Request Policy is a GitHub Action for enforcing conditional pull request
+rules with version-controlled YAML. Require the right reviews, labels,
+documentation, or PR content based on what a pull request changes.
 
-Define conditional rules for pull requests in YAML and enforce them automatically with GitHub Actions.
+It complements GitHub branch protection, CODEOWNERS, and security scanners. GitHub
+handles repository-wide merge requirements; Pull Request Policy handles rules that
+depend on the files, metadata, and context of each pull request.
 
-GitHub branch protection can require approvals and passing checks. But it cannot easily express rules such as:
+## Why use it?
 
-> **If authentication code changes, require 2 write-or-higher approvals.**
+GitHub can require approvals and passing checks, but conditional rules are harder
+to express:
 
-> **If a workflow changes, require security review.**
+- Changes under `src/auth/**` require two trusted approvals.
+- Workflow changes require a security-review label.
+- Public API changes require a changelog entry.
+- Infrastructure changes require rollout and rollback notes.
 
-> **If the public API changes, require a changelog.**
+Pull Request Policy runs inside your existing GitHub Actions workflow. It needs no
+bot, webhook server, database, GitHub App, or external service.
 
-That's what Pull Request Policy adds.
+## Quick start
 
-## GitHub controls vs. Pull Request Policy
-
-| Capability                             | GitHub | Pull Request Policy |
-| -------------------------------------- | :----: | :-----------------: |
-| Require trusted approvals              |   ✅   |         ✅          |
-| Require passing checks                 |   ✅   |          —          |
-| Rules based on changed files           |   ❌   |         ✅          |
-| Conditional approval requirements      |   ❌   |         ✅          |
-| Require labels for specific changes    |   ❌   |         ✅          |
-| Require PR description content         |   ❌   |         ✅          |
-| Check selected file contents           |   ❌   |         ✅          |
-| Combine rules with `all`, `any`, `not` |   ❌   |         ✅          |
-| Version-controlled policy as YAML      |   ❌   |         ✅          |
-| External service required              |   —    |         ❌          |
-
-## Example
-
-```yaml
-policies:
-  - id: auth-needs-two-approvals
-    when:
-      changed: ['src/auth/**']
-    require:
-      approval_count_at_least: 2
-    message: 'Auth changes require at least 2 write-or-higher approvals.'
-
-  - id: workflow-needs-security-review
-    when:
-      changed: ['.github/workflows/**']
-    require:
-      has_label: ['security-review']
-    message: 'Workflow changes require security review.'
-```
-
-The policy lives in `.github/pull-request-policy.yml` and runs as a normal GitHub Action.
-
-**No bot. No webhook server. No database. No external service.**
-
-## Quick Start
-
-Create `.github/workflows/policy.yml`:
+Add a workflow such as `.github/workflows/policy.yml`:
 
 ```yaml
 name: pull-request-policy
@@ -71,52 +40,87 @@ jobs:
       contents: read
       pull-requests: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: milaforge/pull-request-policy@v0.1-beta
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: milaforge/pull-request-policy@025b7c153194f0712f91809bfada9fce35057c46 # v0.1-beta
 ```
 
-Then add `.github/pull-request-policy.yml`:
+Then create `.github/pull-request-policy.yml`:
+
+Copy `.github/pull-request-policy.yml.example` as a starting point, then remove
+or customize the example policies for your repository. The action fails loudly if
+this file is missing; it never silently treats an unconfigured repository as
+protected.
 
 ```yaml
 policies:
-  - id: pr-title-format
+  - id: auth-needs-two-approvals
     severity: error
+    when:
+      changed: ['src/auth/**']
     require:
-      title:
-        - '^(feat|fix|docs|refactor|test|chore): .+'
-    message: 'Invalid PR title.'
+      approval_count_at_least: 2
+    message: 'Auth changes require two trusted approvals.'
 ```
 
-Open a pull request. Violations are reported as annotations and `error` policies fail the check.
+Open a pull request. The action reports violations as check annotations and fails
+the job for `error` policies. To make that result block merges, require the policy
+job in your branch protection or ruleset. See [Quick Start](docs/quick-start.md)
+for the governance setup.
 
-## What can you check?
+The action failing and GitHub blocking a merge are separate things: a failed job
+only becomes a merge gate after a repository administrator requires this workflow's
+status check through branch protection or a ruleset. CODEOWNERS can separately
+protect the workflow, policy file, and CODEOWNERS file.
 
-| Predicate                 | Checks                    |
-| ------------------------- | ------------------------- |
-| `changed`                 | Changed files and paths   |
-| `exists`                  | Files in the repository   |
-| `title`                   | PR title                  |
-| `body`                    | PR description            |
-| `has_label`               | PR labels                 |
-| `approval_count_at_least` | Write-or-higher approvals |
-| `file_contains`           | File contents             |
+## What it checks
 
-Combine predicates with `all`, `any`, and `not`, and use `when` for conditional policies.
+Policies can inspect changed files, repository files, PR titles, PR descriptions,
+labels, trusted approvals, and targeted file contents. Combine conditions with
+`all`, `any`, and `not`, and use `when` for conditional rules.
 
-## Why?
+The action reads the policy from the pull request's immutable base commit, so a PR
+cannot weaken the policy that evaluates that same PR. Policy changes take effect
+after they merge.
 
-**Make repository-specific engineering and security rules executable.**
+### Where facts come from
 
-Pull Request Policy complements branch protection, CODEOWNERS, and security scanners by enforcing rules based on **what a pull request changes**.
+| Data                                             | Source                                          |
+| ------------------------------------------------ | ----------------------------------------------- |
+| PR title, body, labels, reviewers, and approvals | GitHub API                                      |
+| Changed, added, removed, and renamed files       | GitHub API                                      |
+| File existence and targeted file contents        | Checked-out workspace                           |
+| Policy configuration                             | Pull request base commit through the GitHub API |
 
-## Documentation
+The action currently runs in `pull_request` workflows. It does not evaluate
+push-only workflows because push events do not provide PR reviews, labels, or
+descriptions.
 
-- [How It Works](docs/how-it-works.md)
-- [Quick Start](docs/quick-start.md)
-- [Configuration](docs/configuration.md)
-- [Policy Examples](docs/policy-examples.md)
-- [Architecture](docs/architecture.md)
-- [FAQ](docs/faq.md)
+## Troubleshooting
+
+- **No policy configuration found** — Copy `.github/pull-request-policy.yml.example` to `.github/pull-request-policy.yml`, customize it, commit it, and open a new pull request.
+- **The check failed but the PR can still merge** — Require this workflow's exact status check in branch protection or a ruleset.
+- **An approval was not counted** — Only current approvals from trusted repository collaborators count. See the [FAQ](docs/faq.md#which-approvals-count).
+- **Warnings appear but the job passes** — Start with `warn` policies for testing, then use `error` or set `fail-on-warn: true` when ready to enforce.
+- **The action says it needs a pull request** — Use a `pull_request` workflow; push-only workflows are not supported in v1.
+
+## Security boundaries
+
+Pull Request Policy uses read-only GitHub permissions and does not change branch
+protection, rulesets, CODEOWNERS, or other repository settings. It protects the
+policy decision from same-PR edits by loading the policy from the trusted base
+commit. Repository administrators and explicitly permitted bypass actors may still
+bypass GitHub governance rules.
+
+## Learn more
+
+- [Quick Start](docs/quick-start.md) — installation and merge-gate setup
+- [FAQ](docs/faq.md) — permissions, behavior, troubleshooting, and security boundaries
+- [Configuration Reference](docs/configuration.md) — inputs, predicates, and validation
+- [Policy Examples](docs/policy-examples.md) — common rules to adapt
+- [How It Works](docs/how-it-works.md) — evaluation flow and data sources
+- [Architecture](docs/architecture.md) — implementation and design constraints
 
 ## License
 
