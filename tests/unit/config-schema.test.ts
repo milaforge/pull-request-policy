@@ -26,6 +26,72 @@ describe('validateConfig', () => {
     });
   });
 
+  it('normalizes map policies with defaults and scalar predicate values', () => {
+    const config = validateConfig({
+      policies: {
+        auth: {
+          when: { changed: 'src/auth/**' },
+          require: { approvals: 2 },
+        },
+        changelog: {
+          when: { changed: 'src/api/**' },
+          require: { changed: 'CHANGELOG.md' },
+        },
+        'security-review': {
+          when: { changed: '.github/workflows/**' },
+          require: { label: 'security-review' },
+        },
+        title: {
+          require: { title: '^(feat|fix): .+' },
+        },
+      },
+    });
+
+    expect(config.policies).toEqual([
+      {
+        id: 'auth',
+        severity: 'error',
+        when: { changed: ['src/auth/**'] },
+        require: { approval_count_at_least: 2 },
+        message: 'Policy "auth" requires at least 2 trusted approvals.',
+      },
+      {
+        id: 'changelog',
+        severity: 'error',
+        when: { changed: ['src/api/**'] },
+        require: { changed: ['CHANGELOG.md'] },
+        message: 'Policy "changelog" requirement was not met.',
+      },
+      {
+        id: 'security-review',
+        severity: 'error',
+        when: { changed: ['.github/workflows/**'] },
+        require: { has_label: ['security-review'] },
+        message: 'Policy "security-review" requirement was not met.',
+      },
+      {
+        id: 'title',
+        severity: 'error',
+        require: { title: ['^(feat|fix): .+'] },
+        message: 'Policy "title" requirement was not met.',
+      },
+    ]);
+  });
+
+  it('combines multiple map predicates with all', () => {
+    const config = validateConfig({
+      policies: {
+        release: {
+          require: { changed: 'CHANGELOG.md', label: 'release' },
+        },
+      },
+    });
+
+    expect(config.policies[0]?.require).toEqual({
+      all: [{ changed: ['CHANGELOG.md'] }, { has_label: ['release'] }],
+    });
+  });
+
   it('accepts a valid config', () => {
     const config = validateConfig({
       policies: [

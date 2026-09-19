@@ -1,18 +1,19 @@
 # Pull Request Policy sample configuration.
 # Copy this file to .github/pull-request-policy.yml and remove policies you do
-# not need. The compact form below is the recommended starting point.
+# not need. The policy map below is the recommended starting point.
 
 policies:
   auth:
     when:
       changed: src/auth/**
-    approvals: 2
+    require:
+      approvals: 2
 
-# Advanced examples
+# Additional examples
 #
 # To use one of these, replace the policies section above with the complete
-# example. Advanced policies support custom IDs, severity, messages, and
-# predicates that cannot be expressed by the compact form.
+# example. Policies support optional severity, messages, descriptions, and
+# combinators while retaining the same map syntax.
 #
 ## Require tests or failure-mode documentation for queue changes:
 # policies:

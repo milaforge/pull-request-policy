@@ -14,30 +14,35 @@ To make the action a merge gate, protect the target branch and require this poli
 
 ## Root level
 
-| Key        | Type                             | Description                                                                        |
-| :--------- | :------------------------------- | :--------------------------------------------------------------------------------- |
-| `policies` | `Policy[]` or compact policy map | Policies to evaluate. Use the compact map for common changed-files approval rules. |
+| Key        | Type                     | Description                                                               |
+| :--------- | :----------------------- | :------------------------------------------------------------------------ |
+| `policies` | `Policy[]` or policy map | Policies to evaluate. The map form is the recommended user-facing syntax. |
 
 ## Policy Shape
 
 Each policy defines when it applies and what it requires.
 
-For the common case of requiring approvals for changes under a path, use the
-compact form:
+The map form works for every predicate. The key becomes the policy ID, severity
+defaults to `error`, and the message is generated when omitted:
 
 ```yaml
 policies:
   auth:
     when:
       changed: src/auth/**
-    approvals: 2
+    require:
+      approvals: 2
+
+  title:
+    require:
+      title: '^(feat|fix): .+'
 ```
 
 The policy name becomes its ID, severity defaults to `error`, and the action
-generates the message. This is normalized internally to
-`approval_count_at_least: 2`. Compact policies currently support one
-`changed` glob and an `approvals` count; use the full form below for other
-predicates, combinators, severities, descriptions, or custom messages.
+generates the message. Scalar strings are accepted wherever a predicate accepts
+strings; arrays remain supported. Multiple keys under `when` or `require` are
+combined with `all`. The map form can also specify `severity`, `description`,
+and `message` when needed.
 
 ```yaml
 policies:

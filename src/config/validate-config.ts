@@ -14,7 +14,14 @@ const POLICY_KEYS = new Set([
   'require',
   'message',
 ]);
-const COMPACT_POLICY_KEYS = new Set(['when', 'approvals']);
+const MAP_POLICY_KEYS = new Set([
+  'description',
+  'severity',
+  'when',
+  'require',
+  'message',
+  'approvals',
+]);
 const FILE_CONTAINS_KEYS = new Set(['globs', 'patterns']);
 const PREDICATE_KEYS = [
   'changed',
@@ -45,36 +52,81 @@ function readPolicies(value: unknown): Policy[] {
   }
   const record = asRecord(value, 'config.policies');
   return Object.entries(record).map(([id, policy], index) =>
-    readCompactPolicy(id, policy, `config.policies.${id || index}`),
+    readMapPolicy(id, policy, `config.policies.${id || index}`),
   );
 }
 
-function readCompactPolicy(id: string, value: unknown, scope: string): Policy {
+function readMapPolicy(id: string, value: unknown, scope: string): Policy {
   const record = asRecord(value, scope);
-  rejectUnknownKeys(record, COMPACT_POLICY_KEYS, scope);
-  const approvals = readNonNegativeInteger(
-    record['approvals'],
-    `${scope}.approvals`,
-  );
-  const when = readCompactWhen(record['when'], `${scope}.when`);
-  return {
-    id: readNonEmptyString(id, `${scope} policy id`),
-    severity: 'error',
-    when,
-    require: { approval_count_at_least: approvals },
-    message: `Policy "${id}" requires at least ${approvals} trusted approval${approvals === 1 ? '' : 's'}.`,
-  };
-}
-
-function readCompactWhen(value: unknown, scope: string): PredicateExpression {
-  const record = asRecord(value, scope);
-  const keys = Object.keys(record);
-  if (keys.length !== 1 || keys[0] !== 'changed') {
-    throw new Error(`${scope} must contain only a changed glob`);
+  rejectUnknownKeys(record, MAP_POLICY_KEYS, scope);
+  const requireValue =
+    record['require'] ??
+    (record['approvals'] === undefined
+      ? undefined
+      : { approvals: record['approvals'] });
+  if (requireValue === undefined) {
+    throw new Error(`${scope}.require is required`);
   }
-  return {
-    changed: [readNonEmptyString(record['changed'], `${scope}.changed`)],
+  const require = readMapPredicate(requireValue, `${scope}.require`);
+  const when = readOptionalMapPredicate(record['when'], `${scope}.when`);
+  const description = readOptionalNonEmptyString(
+    record['description'],
+    `${scope}.description`,
+  );
+  const severity =
+    record['severity'] === undefined
+      ? 'error'
+      : readSeverity(record['severity'], `${scope}.severity`);
+  const policy: Policy = {
+    id: readNonEmptyString(id, `${scope} policy id`),
+    severity,
+    require,
+    message:
+      readOptionalNonEmptyString(record['message'], `${scope}.message`) ??
+      `Policy "${id}" requirement was not met.`,
   };
+  if (when !== undefined) policy.when = when;
+  if (description !== undefined) policy.description = description;
+  if (requireValue && isApprovalMap(requireValue)) {
+    const approvals = readNonNegativeInteger(
+      (requireValue as Record<string, unknown>)['approvals'],
+      `${scope}.require.approvals`,
+    );
+    if (record['message'] === undefined) {
+      policy.message = `Policy "${id}" requires at least ${approvals} trusted approval${approvals === 1 ? '' : 's'}.`;
+    }
+  }
+  return policy;
+}
+
+function readOptionalMapPredicate(
+  value: unknown,
+  scope: string,
+): PredicateExpression | undefined {
+  return value === undefined ? undefined : readMapPredicate(value, scope);
+}
+
+function readMapPredicate(value: unknown, scope: string): PredicateExpression {
+  const record = asRecord(value, scope);
+  const entries = Object.entries(record);
+  if (entries.length === 0) throw new Error(`${scope} must not be empty`);
+  const predicates = entries.map(([key, predicateValue]) =>
+    readPredicate({ [normalizeMapPredicateKey(key)]: predicateValue }, scope),
+  );
+  return predicates.length === 1 ? predicates[0]! : { all: predicates };
+}
+
+function normalizeMapPredicateKey(key: string): string {
+  if (key === 'approvals') return 'approval_count_at_least';
+  if (key === 'label') return 'has_label';
+  return key;
+}
+
+function isApprovalMap(value: unknown): boolean {
+  return (
+    Object.keys(asRecord(value, 'require')).length === 1 &&
+    Object.prototype.hasOwnProperty.call(value, 'approvals')
+  );
 }
 
 function readPolicy(value: unknown, scope: string): Policy {
@@ -192,6 +244,9 @@ function readPredicateArray(
 }
 
 function readStringArray(value: unknown, scope: string): string[] {
+  if (typeof value === 'string') {
+    return [readNonEmptyString(value, scope)];
+  }
   if (!Array.isArray(value) || value.length === 0) {
     throw new Error(`${scope} must be a non-empty array`);
   }
