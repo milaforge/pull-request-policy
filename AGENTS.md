@@ -55,13 +55,14 @@ This defines *what to optimize*, not *what is allowed*.
 
 If `.github/pull-request-policy.yml` is missing:
 
-- If mode = advisory (default):
-  - run in advisory-only mode
-  - emit warning
-  - do not fail CI
+- fail CI loudly with a clear, actionable message;
+- tell the user to copy `.github/pull-request-policy.yml.example`;
+- tell the user to customize and commit `.github/pull-request-policy.yml`;
+- link to the Quick Start documentation.
 
-- If mode = enforce:
-  - fail CI with clear message
+An existing configuration may use `severity: warn` for a gradual rollout. Warn
+policies do not fail CI unless `fail-on-warn: true`; this is the supported dry-run
+path for MVP and does not require a separate dry-run input.
 
 ### Disallowed
 
@@ -99,6 +100,12 @@ Tests must assert deterministic ordering.
 - file existence
 - targeted file content
 
+Fact provenance is part of the product contract:
+
+- PR metadata, reviewers, approvals, and changed-file lists come from the GitHub API;
+- file existence and targeted file contents come from the checked-out workspace;
+- policy configuration is loaded from the pull request's immutable base commit through the GitHub API.
+
 ### Predicates
 
 - `changed(globs)`
@@ -121,6 +128,10 @@ A new capability is allowed only if all are true:
 - required in ≥2 independent real-world examples
 - reduces config or cognitive load
 - fits current mental model
+
+The MVP evaluates `pull_request` workflows. Push-only support is out of scope
+because push events do not provide PR reviews, labels, descriptions, or merge-gate
+semantics. Do not add a dedicated dry-run input; use `warn` severity for rollout.
 
 ## 8. Change Acceptance Criteria (single enforcement gate)
 
@@ -172,6 +183,8 @@ All outputs must be:
 - actionable
 - specific
 
+Missing configuration, invalid configuration, unverified GitHub facts, and policy violations must fail with recovery-oriented instructions. Distinguish an action failure from GitHub blocking a merge: only branch protection or a ruleset requiring the policy job turns a failed check into a normal merge gate.
+
 ## 12. Anti-Goals
 
 Do not optimize for:
@@ -187,6 +200,8 @@ Changes must not:
 
 - require extra GitHub permissions
 - require changes to consumer workflow YAML
+
+Public onboarding must remain concise and route detail to `docs/`. The README must include installation, why the product complements branch protection and CODEOWNERS, the action-failure versus merge-block distinction, fact provenance, concise troubleshooting, and security boundaries. The FAQ must explain trusted approval semantics, read-only permissions, bypass boundaries, and missing configuration.
 
 ## 15. Release Standard
 
