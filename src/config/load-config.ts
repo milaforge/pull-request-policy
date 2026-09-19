@@ -2,14 +2,13 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
 
-import { DEFAULT_CONFIG_PATH } from './default-config';
 import type { PolicyConfig } from './schema';
 import { validateConfig } from './validate-config';
 
+export const DEFAULT_CONFIG_PATH = '.github/pull-request-policy.yml';
+
 export interface LoadedConfig {
   config: PolicyConfig;
-  advisoryOnly: boolean;
-  generatedDefault: boolean;
   resolvedPath: string;
   notices: string[];
 }
@@ -52,8 +51,6 @@ export function loadConfigFromSource(
   const parsed = yaml.load(source);
   return {
     config: validateConfig(parsed),
-    advisoryOnly: false,
-    generatedDefault: false,
     resolvedPath,
     notices: [],
   };

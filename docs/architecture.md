@@ -22,7 +22,7 @@ graph LR
 
 ## Modules
 
-- `src/config`: Parsing, validation, and safe default config generation.
+- `src/config`: Parsing and validation of explicit policy configuration.
 - `src/facts`: PR metadata (via GitHub API) and local repository file access.
 - `src/predicates`: Individual rule implementations (e.g., "does file exist?").
 - `src/engine`: Core logic that evaluates full policies and combinators.

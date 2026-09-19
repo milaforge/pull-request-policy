@@ -2,9 +2,9 @@ import type { PolicyConfig } from '../config/schema';
 import {
   loadConfig,
   loadConfigFromPath,
+  DEFAULT_CONFIG_PATH,
   type LoadedConfig,
 } from '../config/load-config';
-import { DEFAULT_CONFIG_PATH } from '../config/default-config';
 import { evaluatePolicy } from '../engine/evaluate-policy';
 import { collectPolicyFacts } from '../facts/collect-facts';
 import {
@@ -18,7 +18,6 @@ import { createGitHubReporter, type ActionReporter } from './reporter';
 import * as github from '@actions/github';
 
 export interface ActionRunResult {
-  advisoryOnly: boolean;
   errorViolations: number;
   warningViolations: number;
 }
@@ -68,7 +67,6 @@ export async function runAction(
   }
 
   return {
-    advisoryOnly: loaded.advisoryOnly,
     errorViolations,
     warningViolations,
   };
