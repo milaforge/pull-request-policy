@@ -41,14 +41,14 @@ policies:
 #       - "README.md"
 #   message: "This repository should keep a README."
 #
-# `pr_text(patterns)`
+# `body(patterns)`
 # - id: deploy-change-needs-rollback-text
 #   severity: warn
 #   when:
 #     changed:
 #       - ".github/workflows/**"
 #   require:
-#     pr_text:
+#     body:
 #       - "rollback"
 #       - "runbook"
 #   message: "Workflow changes should mention rollback or runbook context in the PR body."
