@@ -30,24 +30,20 @@ jobs:
 `);
   });
 
-  it('renders sharp default quick start policies in stable order', () => {
+  it('renders only the repository-independent starter policy by default', () => {
     const output = generateOutput(createDefaultGeneratorState());
 
     expect(output.errors).toEqual([]);
-    expect(output.policyYaml).toContain('id: title-format');
-    expect(output.policyYaml).toContain('id: docs-runbook-evidence');
+    expect(output.policyYaml).not.toContain('id: title-format');
     expect(output.policyConfig?.policies.map((policy) => policy.id)).toEqual([
-      'title-format',
       'pr-body-required',
-      'tests-for-source-changes',
-      'sensitive-paths',
-      'release-safety',
-      'docs-runbook-evidence',
     ]);
   });
 
   it('builds exact yaml for each quick start preset', () => {
-    const policyMap = buildQuickStartPolicyMap(createDefaultQuickStartState());
+    const state = createDefaultQuickStartState();
+    for (const preset of Object.values(state.presets)) preset.enabled = true;
+    const policyMap = buildQuickStartPolicyMap(state);
 
     expect(generatePolicyYaml([policyMap['title-format']!])).toBe(`policies:
   - id: title-format
@@ -151,7 +147,7 @@ jobs:
     expect(withoutCore.presets['safe-default'].enabled).toBe(false);
     expect(
       buildQuickStartPolicies(withoutCore).map((policy) => policy.id),
-    ).toEqual(['docs-runbook-evidence']);
+    ).toEqual([]);
 
     const withCore = setSafeDefaultEnabled(withoutCore, true);
 
@@ -164,7 +160,6 @@ jobs:
       'tests-for-source-changes',
       'sensitive-paths',
       'release-safety',
-      'docs-runbook-evidence',
     ]);
   });
 });

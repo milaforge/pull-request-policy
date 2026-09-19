@@ -6,20 +6,7 @@ import type { AppRenderModel, CopyTarget } from './ui-types';
 export class PolicyGeneratorApp {
   private readonly container: HTMLElement;
   private state = (() => {
-    const quickStart = createDefaultGeneratorState().quickStart;
-    return {
-      presets: {
-        ...quickStart.presets,
-        'title-format': {
-          ...quickStart.presets['title-format'],
-          enabled: false,
-        },
-        'docs-runbook-evidence': {
-          ...quickStart.presets['docs-runbook-evidence'],
-          enabled: false,
-        },
-      },
-    };
+    return createDefaultGeneratorState().quickStart;
   })();
   private copiedTarget: CopyTarget = null;
 

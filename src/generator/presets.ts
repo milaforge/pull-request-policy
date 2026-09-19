@@ -46,7 +46,7 @@ export const QUICK_START_PRESET_META: Record<
     id: 'safe-default',
     title: 'Safe default',
     description:
-      'One click baseline: title format, PR body required, tests for source changes, stronger review on sensitive paths, and rollout/rollback requirements.',
+      'Legacy macro: enable the core policy templates together. Review each template before using it for your repository.',
     isMacro: true,
   },
   'title-format': {
@@ -181,13 +181,22 @@ function createDocsRunbookEvidencePresetState(): DocsRunbookEvidencePresetState 
 export function createDefaultQuickStartState(): QuickStartState {
   return {
     presets: {
-      'safe-default': { enabled: true },
-      'title-format': createTitleFormatPresetState(),
+      'safe-default': { enabled: false },
+      'title-format': { ...createTitleFormatPresetState(), enabled: false },
       'pr-body-required': createPrBodyRequiredPresetState(),
-      'tests-for-source-changes': createTestsForSourceChangesPresetState(),
-      'sensitive-paths': createSensitivePathsPresetState(),
-      'release-safety': createReleaseSafetyPresetState(),
-      'docs-runbook-evidence': createDocsRunbookEvidencePresetState(),
+      'tests-for-source-changes': {
+        ...createTestsForSourceChangesPresetState(),
+        enabled: false,
+      },
+      'sensitive-paths': {
+        ...createSensitivePathsPresetState(),
+        enabled: false,
+      },
+      'release-safety': { ...createReleaseSafetyPresetState(), enabled: false },
+      'docs-runbook-evidence': {
+        ...createDocsRunbookEvidencePresetState(),
+        enabled: false,
+      },
     },
   };
 }

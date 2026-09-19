@@ -11,7 +11,7 @@ describe('PolicyGeneratorApp', () => {
     });
   });
 
-  it('renders four focused protections and exactly two outputs', () => {
+  it('renders optional protections and exactly two outputs', () => {
     new PolicyGeneratorApp(
       globalThis.document.querySelector('#app') as HTMLElement,
     ).initialize();
@@ -21,7 +21,13 @@ describe('PolicyGeneratorApp', () => {
     expect(globalThis.document.body.textContent).not.toContain('Advanced');
     expect(
       globalThis.document.querySelectorAll('[data-preset-id]').length,
-    ).toBe(4);
+    ).toBe(6);
+    expect(
+      globalThis.document.querySelector('[data-preset-id="pr-body-required"]'),
+    ).toHaveProperty('checked', true);
+    expect(
+      globalThis.document.querySelector('[data-preset-id="title-format"]'),
+    ).toHaveProperty('checked', false);
     expect(globalThis.document.querySelectorAll('.output-card').length).toBe(2);
     expect(globalThis.document.body.textContent).toContain(
       '.github/workflows/policy.yml',

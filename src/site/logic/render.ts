@@ -3,14 +3,19 @@ import type { AppRenderModel, ProtectionOption } from './ui-types';
 
 const OPTIONS: ProtectionOption[] = [
   {
+    id: 'title-format',
+    title: 'Require conventional titles',
+    description: 'Keep titles consistent for review queues and release notes.',
+  },
+  {
     id: 'pr-body-required',
     title: 'Require meaningful PR descriptions',
     description: 'Keep intent and context visible to reviewers.',
   },
   {
     id: 'tests-for-source-changes',
-    title: 'Require tests for src/**',
-    description: 'Ask for test changes when application code changes.',
+    title: 'Require tests for source changes',
+    description: 'Ask for test changes when configured source paths change.',
   },
   {
     id: 'sensitive-paths',
@@ -23,6 +28,12 @@ const OPTIONS: ProtectionOption[] = [
     title: 'Require rollout and rollback notes',
     description:
       'Require both notes for risky delivery and operational changes.',
+  },
+  {
+    id: 'docs-runbook-evidence',
+    title: 'Require docs or runbook evidence',
+    description:
+      'Ask for operational documentation when configured paths change.',
   },
 ];
 
