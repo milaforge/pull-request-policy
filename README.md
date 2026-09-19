@@ -61,7 +61,7 @@ policies:
 Open a pull request. The action reports violations as check annotations and fails
 the job for `error` policies. To make that result block merges, require the policy
 job in your branch protection or ruleset. See [Quick Start](docs/quick-start.md)
-for the governance setup.
+for the merge-gate setup.
 
 The action failing and GitHub blocking a merge are separate things: a failed job
 only becomes a merge gate after a repository administrator requires this workflow's

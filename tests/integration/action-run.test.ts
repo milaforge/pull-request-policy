@@ -55,24 +55,6 @@ policies:
     expect(failures[0]).toMatch(/Queue changes require tests/i);
   });
 
-  it('reports governance advisories without changing the policy result', async () => {
-    const workspace = await createWorkspaceWithConfig(`
-policies: []
-`);
-    const notices: string[] = [];
-
-    const result = await runAction({
-      inputs: { failOnWarn: false },
-      cwd: workspace,
-      governanceNotices: ['Governance advisory: Require the policy job.'],
-      reporter: createReporter({ notices }),
-      factsProvider: () => Promise.resolve(createFacts()),
-    });
-
-    expect(result).toMatchObject({ errorViolations: 0, warningViolations: 0 });
-    expect(notices).toEqual(['Governance advisory: Require the policy job.']);
-  });
-
   it('does not fail for warnings unless fail-on-warn is enabled', async () => {
     const workspace = await createWorkspaceWithConfig(`
 policies:

@@ -52,7 +52,7 @@ The compact form defaults to `error` severity and generates its message. Both fo
 
 This is a repository-admin setup step. The Action can fail its workflow job, but a failed job is not automatically a merge restriction. For example, if a PR title violates the `severity: error` policy, GitHub will show the policy job as **failing** and annotate the PR. If the target branch has no rule requiring that job to pass, a user who has permission to merge can still click **Merge** (or merge through the API); the failure is informational rather than a gate.
 
-1. In **Settings → Rules**, protect the branch that receives PRs (for example, `main`). Require the exact status check produced by this policy job. GitHub then evaluates the check as part of the branch rule: while the policy job is failing, the PR is not mergeable through the normal GitHub merge path; if the job has not completed, it is also blocked as a required check. The rule therefore turns the Action's result into a GitHub-enforced merge condition. Accounts or teams granted an explicit branch-rule bypass can still bypass that condition, so review your bypass list as part of the repository's governance.
+1. In **Settings → Rules**, protect the branch that receives PRs (for example, `main`) and require the exact `policy` status check. A failed check only blocks normal merges after GitHub requires that check; accounts or teams granted an explicit branch-rule bypass can still bypass it.
 2. Add `.github/CODEOWNERS`:
 
    ```text
@@ -64,8 +64,6 @@ This is a repository-admin setup step. The Action can fail its workflow job, but
 3. In the same branch rule, enable **Require review from Code Owners**.
 
 Use the GitHub account or team that should approve governance changes in place of `@repo-owner`. Public repositories can use these controls on GitHub Free. Private repositories still receive the action's base-SHA protection, but GitHub may require a paid plan to enforce branch protection and code-owner review.
-
-The action emits advisory CI notices when it cannot find a CODEOWNERS file, required status checks are absent, or required code-owner review is disabled. It cannot verify which specific job is selected as a required check or whether CODEOWNERS patterns cover every protected path; confirm those in the branch-rule UI.
 
 ---
 

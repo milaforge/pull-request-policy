@@ -13,7 +13,6 @@ import {
 } from '../facts/github-context';
 
 import { loadConfigFromBase } from './base-config';
-import { collectGovernanceNotices } from './governance-advisory';
 import { readInputs, type ActionInputs } from './inputs';
 import { createGitHubReporter, type ActionReporter } from './reporter';
 import * as github from '@actions/github';
@@ -31,7 +30,6 @@ export interface ActionDependencies {
   cwd?: string | undefined;
   runnerTemp?: string | undefined;
   configLoader?: (() => Promise<LoadedConfig>) | undefined;
-  governanceNotices?: string[] | undefined;
 }
 
 /**
@@ -41,10 +39,7 @@ export async function runAction(
   dependencies: ActionDependencies,
 ): Promise<ActionRunResult> {
   const loaded = await readConfig(dependencies);
-  for (const notice of [
-    ...loaded.notices,
-    ...(dependencies.governanceNotices ?? []),
-  ]) {
+  for (const notice of loaded.notices) {
     dependencies.reporter.notice(notice);
   }
 
@@ -150,15 +145,10 @@ export async function main(): Promise<void> {
     }
     const client = github.getOctokit(token);
     const pullRequest = requirePullRequestContext(github.context);
-    const governanceNotices = await collectGovernanceNotices(
-      client,
-      pullRequest,
-    );
     const dependencies: ActionDependencies = {
       inputs,
       reporter,
       runnerTemp: process.env['RUNNER_TEMP'],
-      governanceNotices,
       configLoader: () =>
         loadConfigFromBase(
           client,
