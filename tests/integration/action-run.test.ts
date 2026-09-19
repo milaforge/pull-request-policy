@@ -128,6 +128,7 @@ function createReporter(sink: {
     error: (message) => sink.errors?.push(message),
     fail: (message) => sink.failures?.push(message),
     annotate: () => undefined,
+    writeSummary: () => Promise.resolve(),
   };
 }
 

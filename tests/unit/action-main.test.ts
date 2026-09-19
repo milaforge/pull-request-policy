@@ -9,6 +9,7 @@ const reporter = {
   error: vi.fn(),
   fail: vi.fn(),
   annotate: vi.fn(),
+  writeSummary: vi.fn(),
 };
 
 const readInputs = vi.fn();

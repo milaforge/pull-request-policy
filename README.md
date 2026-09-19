@@ -80,6 +80,9 @@ fails the job for `error` policies. To make that result block merges, require th
 policy job in your branch protection or ruleset. See [Quick Start](docs/quick-start.md)
 for the merge-gate setup.
 
+Each run also writes a `PR Policy` step summary with every policy marked passed,
+violated, or not applicable, including the final counts and violation messages.
+
 The action failing and GitHub blocking a merge are separate things: a failed job
 only becomes a merge gate after a repository administrator requires the exact
 `PR Policy / policy` status check (as GitHub presents it after the first run)

@@ -51,6 +51,7 @@ export async function runAction(
   const warningViolations = countViolations(evaluations, 'warn');
 
   reportEvaluations(dependencies.reporter, evaluations);
+  await dependencies.reporter.writeSummary(evaluations);
 
   dependencies.reporter.info(
     `Policy summary: ${errorViolations} error violation(s), ${warningViolations} warning violation(s).`,
