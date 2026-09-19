@@ -52,13 +52,10 @@ protected.
 
 ```yaml
 policies:
-  - id: auth-needs-two-approvals
-    severity: error
+  auth:
     when:
-      changed: ['src/auth/**']
-    require:
-      approval_count_at_least: 2
-    message: 'Auth changes require two trusted approvals.'
+      changed: src/auth/**
+    approvals: 2
 ```
 
 Open a pull request. The action reports violations as check annotations and fails

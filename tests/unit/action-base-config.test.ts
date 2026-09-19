@@ -11,7 +11,7 @@ describe('loadConfigFromBase', () => {
         type: 'file',
         encoding: 'base64',
         content: Buffer.from(
-          `policies:\n  - id: auth-needs-review\n    severity: error\n    when:\n      changed: ['src/auth/**']\n    require:\n      approval_count_at_least: 2\n    message: Auth changes require two approvals.\n`,
+          `policies:\n  auth:\n    when:\n      changed: src/auth/**\n    approvals: 2\n`,
         ).toString('base64'),
       },
     });

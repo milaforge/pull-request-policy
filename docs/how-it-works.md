@@ -23,16 +23,17 @@ For each policy:
 ## Policy structure
 
 ```yaml
-- id: auth-needs-two-approvals
-  severity: error # error = fail CI, warn = annotate only
-  when:
-    changed: ['src/auth/**'] # optional trigger condition
-  require:
-    approval_count_at_least: 2 # what must be true when triggered
-  message: 'Auth changes require 2 write-or-higher approvals.'
+policies:
+  auth:
+    when:
+      changed: src/auth/**
+    approvals: 2
 ```
 
-`when` is optional. Without it, `require` is evaluated on every PR.
+This compact form defaults to `error`, generates the message, and normalizes to
+the full `Policy` representation. Use the full policy form for advanced
+predicates and combinators. `when` is optional in the full form; without it,
+`require` is evaluated on every PR.
 
 ## Facts collected
 

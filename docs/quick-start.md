@@ -24,6 +24,18 @@ jobs:
 
 `.github/pull-request-policy.yml`:
 
+For common path-based approval rules, use the compact form:
+
+```yaml
+policies:
+  auth:
+    when:
+      changed: src/auth/**
+    approvals: 2
+```
+
+Use the advanced form when you need title, label, body, or file-content predicates, combinators, custom messages, or custom severity. For example, a title rule is written as:
+
 ```yaml
 policies:
   - id: pr-title-format
@@ -34,7 +46,7 @@ policies:
     message: 'PR title must match: feat|fix|docs|refactor|test|chore: <description>'
 ```
 
-Push both files. The action will annotate violations and fail the job for `error`-severity rules.
+The compact form defaults to `error` severity and generates its message. Both forms are normalized to the same internal policy model. Push both files. The action will annotate violations and fail the job for `error`-severity rules.
 
 ## 3. Make it a merge gate
 
@@ -62,53 +74,54 @@ The action emits advisory CI notices when it cannot find a CODEOWNERS file, requ
 ### Require tests when core code changes
 
 ```yaml
-- id: core-needs-tests
-  severity: error
-  when:
-    changed: ['src/core/**', 'src/security/**']
-  require:
-    changed: ['tests/**']
-  message: 'Core or security changes must include tests.'
+policies:
+  - id: core-needs-tests
+    severity: error
+    when:
+      changed: ['src/core/**', 'src/security/**']
+    require:
+      changed: ['tests/**']
+    message: 'Core or security changes must include tests.'
 ```
 
-### Require extra trusted approvals for sensitive paths
+### Require extra trusted approvals for auth changes
 
 ```yaml
-- id: sensitive-paths-need-two-approvals
-  severity: error
-  when:
-    changed: ['.github/workflows/**', 'infra/**', 'src/auth/**']
-  require:
-    approval_count_at_least: 2
-  message: 'Workflow, infra, and auth changes require 2 write-or-higher approvals.'
+policies:
+  sensitive:
+    when:
+      changed: src/auth/**
+    approvals: 2
 ```
 
 ### Allow an exemption label
 
 ```yaml
-- id: api-change-needs-changelog
-  severity: error
-  when:
-    changed: ['src/api/public/**']
-  require:
-    any:
-      - changed: ['CHANGELOG.md']
-      - has_label: ['skip-changelog']
-  message: 'Public API changes must update CHANGELOG.md or carry skip-changelog label.'
+policies:
+  - id: api-change-needs-changelog
+    severity: error
+    when:
+      changed: ['src/api/public/**']
+    require:
+      any:
+        - changed: ['CHANGELOG.md']
+        - has_label: ['skip-changelog']
+    message: 'Public API changes must update CHANGELOG.md or carry skip-changelog label.'
 ```
 
 ### Require rollout notes in PR body
 
 ```yaml
-- id: infra-needs-rollout-plan
-  severity: error
-  when:
-    changed: ['infra/**', 'deploy/**']
-  require:
-    body:
-      - '(?i)rollout'
-      - '(?i)rollback'
-  message: 'Infra changes must mention rollout and rollback in the PR body.'
+policies:
+  - id: infra-needs-rollout-plan
+    severity: error
+    when:
+      changed: ['infra/**', 'deploy/**']
+    require:
+      body:
+        - '(?i)rollout'
+        - '(?i)rollback'
+    message: 'Infra changes must mention rollout and rollback in the PR body.'
 ```
 
 ---

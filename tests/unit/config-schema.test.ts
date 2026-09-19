@@ -3,6 +3,29 @@ import { describe, expect, it } from 'vitest';
 import { validateConfig } from '../../src/config/validate-config';
 
 describe('validateConfig', () => {
+  it('normalizes compact policies into the canonical policy representation', () => {
+    const config = validateConfig({
+      policies: {
+        auth: {
+          when: { changed: 'src/auth/**' },
+          approvals: 2,
+        },
+      },
+    });
+
+    expect(config).toEqual({
+      policies: [
+        {
+          id: 'auth',
+          severity: 'error',
+          when: { changed: ['src/auth/**'] },
+          require: { approval_count_at_least: 2 },
+          message: 'Policy "auth" requires at least 2 trusted approvals.',
+        },
+      ],
+    });
+  });
+
   it('accepts a valid config', () => {
     const config = validateConfig({
       policies: [

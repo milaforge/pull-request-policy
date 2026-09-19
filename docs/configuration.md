@@ -14,13 +14,30 @@ To make the action a merge gate, protect the target branch, require this policy 
 
 ## Root level
 
-| Key        | Type       | Description                   |
-| :--------- | :--------- | :---------------------------- |
-| `policies` | `Policy[]` | List of policies to evaluate. |
+| Key        | Type                             | Description                                                                        |
+| :--------- | :------------------------------- | :--------------------------------------------------------------------------------- |
+| `policies` | `Policy[]` or compact policy map | Policies to evaluate. Use the compact map for common changed-files approval rules. |
 
 ## Policy Shape
 
 Each policy defines when it applies and what it requires.
+
+For the common case of requiring approvals for changes under a path, use the
+compact form:
+
+```yaml
+policies:
+  auth:
+    when:
+      changed: src/auth/**
+    approvals: 2
+```
+
+The policy name becomes its ID, severity defaults to `error`, and the action
+generates the message. This is normalized internally to
+`approval_count_at_least: 2`. Compact policies currently support one
+`changed` glob and an `approvals` count; use the full form below for other
+predicates, combinators, severities, descriptions, or custom messages.
 
 ```yaml
 policies:

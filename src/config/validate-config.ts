@@ -14,6 +14,7 @@ const POLICY_KEYS = new Set([
   'require',
   'message',
 ]);
+const COMPACT_POLICY_KEYS = new Set(['when', 'approvals']);
 const FILE_CONTAINS_KEYS = new Set(['globs', 'patterns']);
 const PREDICATE_KEYS = [
   'changed',
@@ -37,12 +38,43 @@ export function validateConfig(config: unknown): PolicyConfig {
 }
 
 function readPolicies(value: unknown): Policy[] {
-  if (!Array.isArray(value)) {
-    throw new Error('config.policies must be an array');
+  if (Array.isArray(value)) {
+    return value.map((policy, index) =>
+      readPolicy(policy, `config.policies[${index}]`),
+    );
   }
-  return value.map((policy, index) =>
-    readPolicy(policy, `config.policies[${index}]`),
+  const record = asRecord(value, 'config.policies');
+  return Object.entries(record).map(([id, policy], index) =>
+    readCompactPolicy(id, policy, `config.policies.${id || index}`),
   );
+}
+
+function readCompactPolicy(id: string, value: unknown, scope: string): Policy {
+  const record = asRecord(value, scope);
+  rejectUnknownKeys(record, COMPACT_POLICY_KEYS, scope);
+  const approvals = readNonNegativeInteger(
+    record['approvals'],
+    `${scope}.approvals`,
+  );
+  const when = readCompactWhen(record['when'], `${scope}.when`);
+  return {
+    id: readNonEmptyString(id, `${scope} policy id`),
+    severity: 'error',
+    when,
+    require: { approval_count_at_least: approvals },
+    message: `Policy "${id}" requires at least ${approvals} trusted approval${approvals === 1 ? '' : 's'}.`,
+  };
+}
+
+function readCompactWhen(value: unknown, scope: string): PredicateExpression {
+  const record = asRecord(value, scope);
+  const keys = Object.keys(record);
+  if (keys.length !== 1 || keys[0] !== 'changed') {
+    throw new Error(`${scope} must contain only a changed glob`);
+  }
+  return {
+    changed: [readNonEmptyString(record['changed'], `${scope}.changed`)],
+  };
 }
 
 function readPolicy(value: unknown, scope: string): Policy {
