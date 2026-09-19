@@ -1,6 +1,6 @@
 # Configuration Reference
 
-The policy engine uses a YAML configuration file to define rules. By default, the action reads `.github/pull-request-policy.yml` from the pull request's base SHA, not from the checked-out PR workspace. A policy change therefore takes effect only after it merges.
+The policy engine uses a YAML configuration file to define rules. By default, the action reads `.github/pull-request-policy.yml` from the pull request's base SHA, not from the PR head. A policy change therefore takes effect only after it merges.
 
 ## Action Inputs
 

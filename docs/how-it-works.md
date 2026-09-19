@@ -41,8 +41,8 @@ For each policy:
 | Changed files            | GitHub API diff                                              |
 | PR title / body / labels | GitHub API                                                   |
 | Approval count           | Approved reviewers with GitHub `write` or `admin` permission |
-| File existence           | Checked-out repo                                             |
-| File contents            | Checked-out repo (only when `file_contains` is used)         |
+| File existence           | GitHub tree API at the pull request head SHA                 |
+| File contents            | GitHub Contents API at the pull request head SHA             |
 
 File contents are read lazily — only if a `file_contains` predicate is present.
 

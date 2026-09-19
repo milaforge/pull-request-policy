@@ -84,7 +84,7 @@ permissions:
 
 These provide the read access required to evaluate pull request metadata and repository files.
 
-The action is intended to run on `pull_request` events. It requires a pull request context and is not a general-purpose check for `push` workflows. The checkout step should use `persist-credentials: false` unless the workflow has a separate reason to retain credentials.
+The action is intended to run on `pull_request` events. It requires a pull request context and is not a general-purpose check for `push` workflows. It reads repository facts from GitHub's API and does not need a checkout step.
 
 ## Can I combine multiple conditions?
 

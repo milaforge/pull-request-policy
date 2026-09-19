@@ -40,9 +40,6 @@ jobs:
       contents: read
       pull-requests: read
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          persist-credentials: false
       - uses: milaforge/pull-request-policy@025b7c153194f0712f91809bfada9fce35057c46 # v0.1-beta
 ```
 
@@ -90,7 +87,7 @@ after they merge.
 | ------------------------------------------------ | ----------------------------------------------- |
 | PR title, body, labels, reviewers, and approvals | GitHub API                                      |
 | Changed, added, removed, and renamed files       | GitHub API                                      |
-| File existence and targeted file contents        | Checked-out workspace                           |
+| File existence and targeted file contents        | GitHub API at the pull request head SHA         |
 | Policy configuration                             | Pull request base commit through the GitHub API |
 
 The action currently runs in `pull_request` workflows. It does not evaluate

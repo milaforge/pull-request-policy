@@ -31,6 +31,6 @@ graph LR
 ## Constraints
 
 - **Pure Engine**: The core evaluation logic has no side effects and is easily testable.
-- **Minimal Footprint**: No external dependencies beyond the GitHub context and the local workspace.
+- **Minimal Footprint**: No external dependencies beyond the GitHub API and action runtime.
 - **Low Noise**: Only reads repository files if explicitly requested by a policy.
 - **Explicit Configuration**: Never silently runs an unenforced policy when the configuration file is missing.

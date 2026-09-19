@@ -144,7 +144,6 @@ export async function main(): Promise<void> {
   const reporter = createGitHubReporter();
 
   try {
-    const workspace = process.env['GITHUB_WORKSPACE'] ?? process.cwd();
     const token = inputs.githubToken ?? process.env['GITHUB_TOKEN'];
     if (!token?.trim()) {
       throw new Error('github-token input is required for pull request facts.');
@@ -158,7 +157,6 @@ export async function main(): Promise<void> {
     const dependencies: ActionDependencies = {
       inputs,
       reporter,
-      cwd: workspace,
       runnerTemp: process.env['RUNNER_TEMP'],
       governanceNotices,
       configLoader: () =>
@@ -168,7 +166,7 @@ export async function main(): Promise<void> {
           inputs.configPath ?? DEFAULT_CONFIG_PATH,
         ),
       factsProvider: async (config) => {
-        return collectPolicyFacts(client, config, workspace);
+        return collectPolicyFacts(client, config);
       },
     };
 

@@ -15,9 +15,6 @@ const readInputs = vi.fn();
 const getOctokit = vi.fn();
 const countApprovals = vi.fn();
 const listChangedFiles = vi.fn();
-const listRepoFiles = vi.fn();
-const readRepoFileContents = vi.fn();
-const collectRepoRequirements = vi.fn();
 const requirePullRequestContext = vi.fn();
 
 vi.mock('../../src/action/inputs', () => ({
@@ -41,12 +38,6 @@ vi.mock('../../src/facts/changed-files', () => ({
   listChangedFiles,
 }));
 
-vi.mock('../../src/facts/repo-files', () => ({
-  collectRepoRequirements,
-  listRepoFiles,
-  readRepoFileContents,
-}));
-
 vi.mock('../../src/facts/github-context', () => ({
   requirePullRequestContext,
 }));
@@ -65,7 +56,6 @@ describe('main', () => {
   });
 
   it('runs the action end-to-end with mocked GitHub facts', async () => {
-    process.env['GITHUB_WORKSPACE'] = '/tmp/workspace';
     process.env['GITHUB_TOKEN'] = 'token';
     process.env['RUNNER_TEMP'] = '/tmp';
 
@@ -109,14 +99,6 @@ describe('main', () => {
       added: [],
       removed: [],
       renamed: [],
-    });
-    collectRepoRequirements.mockReturnValue({
-      needsRepoFiles: true,
-      fileContentGlobs: ['docs/**/*.md'],
-    });
-    listRepoFiles.mockResolvedValue(['docs/runbooks/deploy.md']);
-    readRepoFileContents.mockResolvedValue({
-      'docs/runbooks/deploy.md': 'Rollback guidance',
     });
     countApprovals.mockResolvedValue(2);
 

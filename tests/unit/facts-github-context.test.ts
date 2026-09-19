@@ -9,6 +9,7 @@ describe('requirePullRequestContext', () => {
         pull_request: {
           number: 4,
           base: { sha: 'base-sha', ref: 'main' },
+          head: { sha: 'head-sha' },
           title: 'Update deploy workflow',
           body: 'Includes rollback notes',
           labels: [{ name: 'infra' }, { name: 'release-note-exempt' }],
@@ -23,6 +24,7 @@ describe('requirePullRequestContext', () => {
       repo: 'demo',
       number: 4,
       baseSha: 'base-sha',
+      headSha: 'head-sha',
       baseRef: 'main',
       title: 'Update deploy workflow',
       body: 'Includes rollback notes',
