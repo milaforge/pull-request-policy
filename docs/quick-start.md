@@ -7,11 +7,11 @@ Two files, then open a PR.
 `.github/workflows/policy.yml`:
 
 ```yaml
-name: pull-request-policy
+name: PR Policy
 on: [pull_request]
 
 jobs:
-  check:
+  policy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -52,7 +52,7 @@ The compact form defaults to `error` severity and generates its message. Both fo
 
 This is a repository-admin setup step. The Action can fail its workflow job, but a failed job is not automatically a merge restriction. For example, if a PR title violates the `severity: error` policy, GitHub will show the policy job as **failing** and annotate the PR. If the target branch has no rule requiring that job to pass, a user who has permission to merge can still click **Merge** (or merge through the API); the failure is informational rather than a gate.
 
-1. In **Settings → Rules**, protect the branch that receives PRs (for example, `main`) and require the exact `policy` status check. A failed check only blocks normal merges after GitHub requires that check; accounts or teams granted an explicit branch-rule bypass can still bypass it.
+1. In **Settings → Rules**, protect the branch that receives PRs (for example, `main`) and require the exact `PR Policy / policy` status check, using the label GitHub presents after the first run. A failed check only blocks normal merges after GitHub requires that check; accounts or teams granted an explicit branch-rule bypass can still bypass it.
 2. Add `.github/CODEOWNERS`:
 
    ```text

@@ -29,12 +29,12 @@ bot, webhook server, database, GitHub App, or external service.
 Add a workflow such as `.github/workflows/policy.yml`:
 
 ```yaml
-name: pull-request-policy
+name: PR Policy
 
 on: [pull_request]
 
 jobs:
-  check:
+  policy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -64,8 +64,9 @@ job in your branch protection or ruleset. See [Quick Start](docs/quick-start.md)
 for the merge-gate setup.
 
 The action failing and GitHub blocking a merge are separate things: a failed job
-only becomes a merge gate after a repository administrator requires this workflow's
-status check through branch protection or a ruleset. CODEOWNERS can separately
+only becomes a merge gate after a repository administrator requires the exact
+`PR Policy / policy` status check (as GitHub presents it after the first run)
+through branch protection or a ruleset. CODEOWNERS can separately
 protect the workflow, policy file, and CODEOWNERS file.
 
 ## What it checks
@@ -94,7 +95,7 @@ descriptions.
 ## Troubleshooting
 
 - **No policy configuration found** — Copy `.github/pull-request-policy.yml.sample` to `.github/pull-request-policy.yml`, customize it, commit it, and open a new pull request.
-- **The check failed but the PR can still merge** — Require this workflow's exact status check in branch protection or a ruleset.
+- **The check failed but the PR can still merge** — Require the exact `PR Policy / policy` status check in branch protection or a ruleset.
 - **An approval was not counted** — Only current approvals from trusted repository collaborators count. See the [FAQ](docs/faq.md#which-approvals-count).
 - **Warnings appear but the job passes** — Start with `warn` policies for testing, then use `error` or set `fail-on-warn: true` when ready to enforce.
 - **The action says it needs a pull request** — Use a `pull_request` workflow; push-only workflows are not supported in v1.

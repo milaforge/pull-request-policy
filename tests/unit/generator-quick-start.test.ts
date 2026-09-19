@@ -17,10 +17,10 @@ describe('quick start generator', () => {
   it('generates the default workflow yaml', () => {
     const yaml = generateWorkflowYaml(createDefaultGeneratorState().workflow);
 
-    expect(yaml).toBe(`name: pull-request-policy
+    expect(yaml).toBe(`name: PR Policy
 on: [pull_request]
 jobs:
-  check-policy:
+  policy:
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -73,7 +73,7 @@ describe('main', () => {
           getBranchProtection: vi.fn().mockResolvedValue({
             data: {
               required_status_checks: {
-                contexts: ['pull-request-policy / check'],
+                contexts: ['PR Policy / policy'],
               },
               required_pull_request_reviews: {
                 require_code_owner_reviews: true,

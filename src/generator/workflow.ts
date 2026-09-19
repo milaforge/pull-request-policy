@@ -7,10 +7,10 @@ function appendLine(lines: string[], level: number, value: string): void {
 
 export function generateWorkflowYaml(options: WorkflowOptions): string {
   const lines: string[] = [];
-  appendLine(lines, 0, 'name: pull-request-policy');
+  appendLine(lines, 0, 'name: PR Policy');
   appendLine(lines, 0, 'on: [pull_request]');
   appendLine(lines, 0, 'jobs:');
-  appendLine(lines, 1, 'check-policy:');
+  appendLine(lines, 1, 'policy:');
   appendLine(lines, 2, 'runs-on: ubuntu-latest');
   appendLine(lines, 2, 'permissions:');
   appendLine(lines, 3, 'contents: read');
