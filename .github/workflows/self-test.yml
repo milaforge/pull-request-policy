@@ -57,3 +57,10 @@ jobs:
         run: |
           echo "Expected the failure fixture to fail."
           exit 1
+      - id: pull-request-policy
+        continue-on-error: false
+        uses: ./
+        with:
+          github-token: ${{ github.token }}
+          config-path: .github/pull-request-policy.yml
+          mode: audit

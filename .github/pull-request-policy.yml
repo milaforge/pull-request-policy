@@ -1,0 +1,24 @@
+policies:
+  github-changes-need-approval:
+    when:
+      changed: '.github/**'
+    require:
+      approvals: 1
+    message: '.github changes require one trusted approval'
+
+  conventional-title:
+    require:
+      title: '^(feat|fix|docs|refactor|test|chore|build|ci|perf|revert)(\([^)]+\))?!?: .+'
+    message: 'PR title must use Conventional Commits format'
+
+  non-empty-body:
+    require:
+      body: '(?s).*\S.*'
+    message: 'PR body must not be empty'
+
+  lockfile-changes-need-changelog:
+    when:
+      changed: 'pnpm-lock.yaml'
+    require:
+      changed: 'CHANGELOG.md'
+    message: 'Changes to pnpm-lock.yaml require a created or updated CHANGELOG.md'
