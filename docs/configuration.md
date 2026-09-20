@@ -11,7 +11,7 @@ The policy engine uses a YAML configuration file to define rules. By default, th
 | `github-token` | GitHub token for reading the base policy and PR facts                                                      | `${{ github.token }}`             |
 | `mode`         | `audit` reports violations without failing; `enforce` fails `error` violations                             | `enforce`                         |
 
-Use `mode: audit` while trialing policies on real pull requests, then switch to `mode: enforce`. To make the action a merge gate, protect the target branch and require this policy job’s status check. CODEOWNERS and code-owner review can separately protect the workflow and policy configuration. See [Quick Start](quick-start.md#3-make-it-a-merge-gate).
+Use `mode: audit` while trialing policies on real pull requests, then switch to `mode: enforce`. To make the action a merge gate, protect the target branch and require this policy job’s status check. CODEOWNERS and code-owner review can separately protect the workflow and policy configuration. See [Quick Start](quick-start.md#make-it-a-merge-gate).
 
 ## Root level
 

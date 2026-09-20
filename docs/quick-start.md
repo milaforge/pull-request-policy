@@ -1,9 +1,17 @@
 # Quick Start
 
-## Fastest first run: one workflow file
+## Fastest first run: one successful experiment
 
-Paste one workflow and see the action work immediately. The optional `policy`
-input contains the same YAML normally stored in the policy file:
+Complete this small loop before setting up merge gates or repository governance:
+
+1. Paste this workflow.
+2. Open a pull request that changes a file under `src/auth/`.
+3. See PR Policy report a violation because the pull request has fewer than two trusted approvals.
+4. Customize the rule for your repository.
+
+### 1. Paste this workflow
+
+The inline `policy` input keeps this first experiment to one file:
 
 ```yaml
 name: PR Policy
@@ -27,13 +35,33 @@ jobs:
                 approvals: 2
 ```
 
-Use inline policy for onboarding and small experiments. When the policy grows,
-move it to `.github/pull-request-policy.yml` and remove the `policy` input.
-File mode is the recommended production mode because the action reads that
-configuration from the pull request's immutable base SHA. Inline policy is
-part of the workflow change and does not have that protection.
+### 2. Open a pull request
 
-## Production setup: workflow plus policy file
+Create a pull request that changes a file under `src/auth/`. With no trusted
+approvals, the action reports a violation in the pull request.
+
+### 3. See the violation
+
+The `PR Policy / policy` check reports that the change requires two trusted
+approvals. The check demonstrates the policy before you configure any branch
+rules or repository governance.
+
+### 4. Customize your first rule
+
+Change `src/auth/**` to a path your repository uses, or change `approvals: 2`
+to the review threshold you want to try. Inline policy is useful for this
+experiment. When the policy grows, move it to
+`.github/pull-request-policy.yml` and remove the `policy` input. File mode is
+the recommended production mode because the action reads that configuration
+from the pull request's immutable base SHA. Inline policy is part of the
+workflow change and does not have that protection.
+
+Ready to block merges? Continue with [Production setup](#production-setup).
+
+## Production setup
+
+For a durable policy, use a committed policy file and then configure the
+repository controls that make the result a merge gate.
 
 ## 1. Add the workflow
 
@@ -79,7 +107,7 @@ default, and scalar strings are accepted. Add `severity`, `description`, or
 violations without failing. Inspect one real PR, then change the workflow to
 `mode: enforce`.
 
-## 3. Make it a merge gate
+### Make it a merge gate
 
 This is a repository-admin setup step. The Action can fail its workflow job, but a failed job is not automatically a merge restriction. For example, if a PR title violates the `severity: error` policy, GitHub will show the policy job as **failing** and annotate the PR. If the target branch has no rule requiring that job to pass, a user who has permission to merge can still click **Merge** (or merge through the API); the failure is informational rather than a gate.
 

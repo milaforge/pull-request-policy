@@ -67,7 +67,7 @@ applicable policies.
 
 A failed Action check becomes a merge gate only after you require the exact
 `PR Policy / policy` status check in GitHub Rules (branch protection or a
-ruleset). See [Make it a merge gate](docs/quick-start.md#3-make-it-a-merge-gate).
+ruleset). See [Make it a merge gate](docs/quick-start.md#make-it-a-merge-gate).
 
 For a gradual rollout, use `severity: warn`; warnings are reported without
 failing the job. Switch policies to `error` when you are ready to enforce them.
