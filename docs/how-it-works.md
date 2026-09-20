@@ -1,6 +1,6 @@
 # How It Works
 
-`pull-request-policy` runs as a GitHub Action on every pull request. It loads the YAML policy file from the pull request's base SHA, collects the PR facts those policies need, evaluates the rules, and reports results as CI annotations.
+`pull-request-policy` runs as a GitHub Action on every pull request. It loads the YAML policy file from the pull request's base SHA, collects the PR facts those policies need, evaluates the rules, and reports results as CI annotations. See [Base-SHA Configuration Loading](base-sha-config.md) for what this means when a PR changes a policy file or test fixture.
 
 ## Evaluation flow
 

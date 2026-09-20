@@ -77,4 +77,75 @@ describe('validateConfig', () => {
       validateConfig({ policies: { auth: { require: { changed: [] } } } }),
     ).toThrow(/non-empty array/);
   });
+
+  it('accepts optional policy fields and nested predicate forms', () => {
+    expect(
+      validateConfig({
+        policies: {
+          release: {
+            description: 'Release checks',
+            severity: 'warn',
+            require: {
+              all: [
+                { any: [{ title: ['release'] }, { body: ['notes'] }] },
+                {
+                  not: { file_contains: { globs: '*.md', patterns: 'draft' } },
+                },
+              ],
+            },
+          },
+        },
+      }).policies[0],
+    ).toMatchObject({
+      id: 'release',
+      description: 'Release checks',
+      severity: 'warn',
+      require: {
+        all: [
+          { any: [{ title: ['release'] }, { body: ['notes'] }] },
+          { not: { file_contains: { globs: ['*.md'], patterns: ['draft'] } } },
+        ],
+      },
+    });
+  });
+
+  it('rejects malformed policy structures with actionable scopes', () => {
+    const invalidConfigs: unknown[] = [
+      {},
+      { policies: { auth: {} } },
+      { policies: { auth: { require: {} } } },
+      { policies: { auth: { require: { all: [] } } } },
+      { policies: { auth: { require: { not: {} } } } },
+      { policies: { auth: { require: { file_contains: {} } } } },
+      { policies: { auth: { require: { changed: [1] } } } },
+      { policies: { auth: { require: { changed: '' } } } },
+      { policies: { auth: { severity: 'invalid', require: { title: 'x' } } } },
+      { policies: { auth: { description: 1, require: { title: 'x' } } } },
+      { policies: { auth: { require: { unknown: true } } } },
+      {
+        policies: {
+          auth: { require: { file_contains: { globs: [], patterns: 'x' } } },
+        },
+      },
+      {
+        policies: {
+          auth: { require: { file_contains: { globs: 'x', patterns: [] } } },
+        },
+      },
+    ];
+
+    for (const config of invalidConfigs) {
+      expect(() => validateConfig(config)).toThrow();
+    }
+  });
+
+  it('rejects unknown keys and invalid top-level values', () => {
+    expect(() => validateConfig({ extra: true, policies: {} })).toThrow(
+      /unknown key/,
+    );
+    expect(() => validateConfig({ policies: null })).toThrow(/object/);
+    expect(() =>
+      validateConfig({ policies: { '': { require: { title: 'x' } } } }),
+    ).toThrow(/policy id/);
+  });
 });

@@ -47,7 +47,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
-      - id: pull-request-policy
+      - id: pull-request-policy-self-test
         continue-on-error: true
         uses: ./
         with:
@@ -55,7 +55,7 @@ jobs:
           config-path: tests/fixtures/self-test/fail.yml
       - if: steps.pull-request-policy.outcome != 'failure'
         run: |
-          echo "Expected the failure fixture to fail."
+          echo "Expected the failure self-test fixture to fail."
           exit 1
       - id: pull-request-policy
         continue-on-error: false
