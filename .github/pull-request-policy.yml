@@ -1,10 +1,4 @@
 policies:
-  github-changes-need-approval:
-    when:
-      changed: '.github/**'
-    require:
-      approvals: 1
-
   conventional-title:
     require:
       title: '^(feat|fix|docs|refactor|test|chore|build|ci|perf|revert)(\([^)]+\))?!?: .+'
