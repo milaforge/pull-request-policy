@@ -47,7 +47,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
-      - id: pull-request-policy
+      - id: pull-request-policy-self-test
         continue-on-error: true
         uses: ./
         with:
