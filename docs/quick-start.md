@@ -1,6 +1,39 @@
 # Quick Start
 
-Two files, then open a PR.
+## Fastest first run: one workflow file
+
+Paste one workflow and see the action work immediately. The optional `policy`
+input contains the same YAML normally stored in the policy file:
+
+```yaml
+name: PR Policy
+on: [pull_request]
+
+jobs:
+  policy:
+    permissions:
+      contents: read
+      pull-requests: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: milaforge/pull-request-policy@v1
+        with:
+          mode: audit
+          policy: |
+            policies:
+              auth:
+                when:
+                  changed: src/auth/**
+                approvals: 2
+```
+
+Use inline policy for onboarding and small experiments. When the policy grows,
+move it to `.github/pull-request-policy.yml` and remove the `policy` input.
+File mode is the recommended production mode because the action reads that
+configuration from the pull request's immutable base SHA. Inline policy is
+part of the workflow change and does not have that protection.
+
+## Production setup: workflow plus policy file
 
 ## 1. Add the workflow
 

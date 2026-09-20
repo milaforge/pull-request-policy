@@ -2,6 +2,7 @@ import type { PolicyConfig } from '../config/schema';
 import {
   loadConfig,
   loadConfigFromPath,
+  loadConfigFromSource,
   DEFAULT_CONFIG_PATH,
   type LoadedConfig,
 } from '../config/load-config';
@@ -80,6 +81,9 @@ async function readConfig(
   if (dependencies.configLoader !== undefined) {
     return dependencies.configLoader();
   }
+  if (dependencies.inputs.policy !== undefined) {
+    return loadConfigFromSource(dependencies.inputs.policy, '<policy input>');
+  }
   const configPath = dependencies.inputs.configPath;
   if (configPath !== undefined) {
     return loadConfigFromPath(configPath);
@@ -152,11 +156,15 @@ export async function main(): Promise<void> {
       reporter,
       runnerTemp: process.env['RUNNER_TEMP'],
       configLoader: () =>
-        loadConfigFromBase(
-          client,
-          pullRequest,
-          inputs.configPath ?? DEFAULT_CONFIG_PATH,
-        ),
+        inputs.policy !== undefined
+          ? Promise.resolve(
+              loadConfigFromSource(inputs.policy, '<policy input>'),
+            )
+          : loadConfigFromBase(
+              client,
+              pullRequest,
+              inputs.configPath ?? DEFAULT_CONFIG_PATH,
+            ),
       factsProvider: async (config) => {
         return collectPolicyFacts(client, config);
       },

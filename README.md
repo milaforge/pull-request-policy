@@ -10,6 +10,34 @@ GitHub App.
 
 ## Start with a policy
 
+For the fastest first run, keep the workflow and policy together:
+
+```yaml
+name: PR Policy
+on: [pull_request]
+
+jobs:
+  policy:
+    permissions:
+      contents: read
+      pull-requests: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: milaforge/pull-request-policy@v1
+        with:
+          mode: audit
+          policy: |
+            policies:
+              auth:
+                when:
+                  changed: src/auth/**
+                approvals: 2
+```
+
+Inline `policy` is a convenient quick-start mode. When the policy grows, move
+it to `.github/pull-request-policy.yml`; the file is loaded from the pull
+request's immutable base SHA and is the recommended production mode.
+
 [Open the policy generator](https://milaforge.github.io/pull-request-policy/) to choose protections and copy the
 workflow and policy files into your repository. For a manual starting point,
 add the action to a `pull_request` workflow, then create

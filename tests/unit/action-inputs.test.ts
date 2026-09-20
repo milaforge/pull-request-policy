@@ -8,6 +8,7 @@ describe('readInputs', () => {
       getInput(name) {
         const values: Record<string, string> = {
           'config-path': ' .github/custom.yml ',
+          policy: ' policies: []\n ',
           'github-token': ' secret ',
           'fail-on-warn': 'true',
           mode: 'audit',
@@ -17,6 +18,7 @@ describe('readInputs', () => {
     });
 
     expect(inputs).toEqual({
+      policy: 'policies: []',
       configPath: '.github/custom.yml',
       githubToken: 'secret',
       failOnWarn: true,
@@ -37,6 +39,14 @@ describe('readInputs', () => {
     });
 
     expect(inputs).toEqual({ failOnWarn: false, mode: 'enforce' });
+  });
+
+  it('reads an inline policy input', () => {
+    expect(
+      readInputs({
+        getInput: (name) => (name === 'policy' ? 'policies: []' : ''),
+      }),
+    ).toEqual({ policy: 'policies: []', failOnWarn: false, mode: 'enforce' });
   });
 
   it('rejects an unknown mode', () => {

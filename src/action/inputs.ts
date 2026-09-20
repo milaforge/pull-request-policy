@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 
 export interface ActionInputs {
+  policy?: string;
   configPath?: string;
   githubToken?: string;
   failOnWarn: boolean;
@@ -16,6 +17,7 @@ export interface InputReader {
 
 export function readInputs(reader: InputReader = core): ActionInputs {
   const configPath = normalize(reader.getInput('config-path'));
+  const policy = normalize(reader.getInput('policy'));
   const githubToken = normalize(reader.getInput('github-token'));
   const inputs: ActionInputs = {
     failOnWarn: readBooleanInput(reader.getInput('fail-on-warn')),
@@ -23,6 +25,9 @@ export function readInputs(reader: InputReader = core): ActionInputs {
   };
   if (configPath !== undefined) {
     inputs.configPath = configPath;
+  }
+  if (policy !== undefined) {
+    inputs.policy = policy;
   }
   if (githubToken !== undefined) {
     inputs.githubToken = githubToken;

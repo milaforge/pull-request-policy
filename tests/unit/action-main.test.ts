@@ -115,6 +115,46 @@ describe('main', () => {
     );
   });
 
+  it('uses inline policy without fetching the base policy file', async () => {
+    process.env['GITHUB_TOKEN'] = 'token';
+    readInputs.mockReturnValue({
+      policy:
+        'policies:\n  auth:\n    when:\n      changed: src/auth/**\n    approvals: 2\n',
+      failOnWarn: false,
+      mode: 'audit',
+    });
+    const getContent = vi.fn();
+    getOctokit.mockReturnValue({
+      rest: { repos: { getContent } },
+    });
+    requirePullRequestContext.mockReturnValue({
+      owner: 'acme',
+      repo: 'demo',
+      number: 12,
+      baseSha: 'base-sha',
+      baseRef: 'main',
+      title: 'Auth change',
+      body: '',
+      labels: [],
+      requestedReviewers: [],
+    });
+    listChangedFiles.mockResolvedValue({
+      all: ['src/auth/login.ts'],
+      added: [],
+      removed: [],
+      renamed: [],
+    });
+    countApprovals.mockResolvedValue(1);
+
+    const { main } = await import('../../src/action/main');
+    await main();
+
+    expect(getContent).not.toHaveBeenCalled();
+    expect(reporter.error).toHaveBeenCalledWith(
+      expect.stringContaining('auth'),
+    );
+  });
+
   it('fails cleanly when no GitHub token is available', async () => {
     readInputs.mockReturnValue({ failOnWarn: false, mode: 'enforce' });
 
