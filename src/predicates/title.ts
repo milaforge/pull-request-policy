@@ -7,5 +7,12 @@ export function evaluateTitle(
   patterns: string[],
 ): PredicateOutcome {
   const evidence = findMatchingPatterns(facts.prTitle, patterns);
-  return { passed: evidence.length > 0, evidence };
+  return evidence.length > 0
+    ? { passed: true, evidence }
+    : {
+        passed: false,
+        evidence: [
+          `Current title: ${JSON.stringify(facts.prTitle)}. Expected it to match one of: ${patterns.map((pattern) => JSON.stringify(pattern)).join(', ')}.`,
+        ],
+      };
 }

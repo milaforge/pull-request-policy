@@ -12,8 +12,13 @@ describe('evaluateTitle', () => {
   });
 
   it('fails when no pattern matches', () => {
-    const result = evaluateTitle(createFacts(), ['auth']);
+    const result = evaluateTitle(
+      createFacts({ prTitle: 'test(test):\u00a0test' }),
+      ['^test\\([^)]+\\): .+'],
+    );
 
     expect(result.passed).toBe(false);
+    expect(result.evidence[0]).toContain('Current title: "test(test): test"');
+    expect(result.evidence[0]).toContain('Expected it to match one of:');
   });
 });

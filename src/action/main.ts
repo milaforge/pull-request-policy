@@ -100,7 +100,9 @@ function reportEvaluations(
   reporter: ActionReporter,
   evaluations: ReturnType<typeof evaluatePolicy>[],
 ): void {
-  const violated = evaluations.filter((evaluation) => evaluation.status === 'violated');
+  const violated = evaluations.filter(
+    (evaluation) => evaluation.status === 'violated',
+  );
   reportViolations(reporter, violated, 'error');
   reportViolations(reporter, violated, 'warn');
 }
@@ -112,7 +114,12 @@ function reportViolations(
 ): void {
   const messages = evaluations
     .filter((evaluation) => evaluation.severity === severity)
-    .map((evaluation) => `- [${evaluation.id}]`);
+    .map((evaluation) => {
+      const evidence = evaluation.requireEvidence.join(' ');
+      return evidence === ''
+        ? `- [${evaluation.id}]`
+        : `- [${evaluation.id}] ${evidence}`;
+    });
   if (messages.length === 0) return;
 
   const label = severity === 'error' ? 'violation' : 'warning';

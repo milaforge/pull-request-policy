@@ -61,7 +61,7 @@ async function writePolicySummary(
     statusLabel(evaluation.status),
     formatPolicyName(evaluation.id),
     evaluation.status === 'violated'
-      ? evaluation.message
+      ? [evaluation.message, ...evaluation.requireEvidence].join(' ')
       : evaluation.status === 'skipped'
         ? 'not applicable'
         : 'passed',
