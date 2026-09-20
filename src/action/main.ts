@@ -102,12 +102,6 @@ function reportEvaluations(
 ): void {
   for (const evaluation of evaluations.filter((e) => e.status === 'violated')) {
     reporter.annotate(evaluation);
-    const message = `[${evaluation.id}] ${evaluation.message}`;
-    if (evaluation.severity === 'error') {
-      reporter.error(message);
-    } else {
-      reporter.warning(message);
-    }
   }
 }
 

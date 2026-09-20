@@ -149,9 +149,56 @@ describe('main', () => {
     await main();
 
     expect(getContent).not.toHaveBeenCalled();
-    expect(reporter.error).toHaveBeenCalledWith(
-      expect.stringContaining('auth'),
-    );
+    expect(reporter.annotate).toHaveBeenCalledOnce();
+    expect(reporter.error).not.toHaveBeenCalled();
+  });
+
+  it('reports each violated policy through annotations only once', async () => {
+    const { runAction } = await import('../../src/action/main');
+
+    await runAction({
+      inputs: { mode: 'audit' },
+      reporter,
+      configLoader: async () => ({
+        config: {
+          policies: [
+            {
+              id: 'first-rule',
+              severity: 'error',
+              when: { body: ['required'] },
+              require: { body: ['present'] },
+              message: 'First rule failed.',
+            },
+            {
+              id: 'second-rule',
+              severity: 'error',
+              when: { body: ['required'] },
+              require: { body: ['present'] },
+              message: 'Second rule failed.',
+            },
+          ],
+        },
+        notices: [],
+        resolvedPath: '<test policy>',
+      }),
+      factsProvider: async () => ({
+        changedFiles: [],
+        addedFiles: [],
+        removedFiles: [],
+        renamedFiles: [],
+        prTitle: 'Title',
+        prBody: 'required',
+        labels: [],
+        requestedReviewers: [],
+        approvalsCount: 0,
+        repoFiles: [],
+        fileContents: {},
+      }),
+    });
+
+    expect(reporter.annotate).toHaveBeenCalledTimes(2);
+    expect(reporter.error).not.toHaveBeenCalled();
+    expect(reporter.warning).not.toHaveBeenCalled();
   });
 
   it('fails cleanly when no GitHub token is available', async () => {
