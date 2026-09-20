@@ -61,14 +61,15 @@ require:
 ## Severity
 
 - `error` — fails CI
-- `warn` — annotates PR, does not fail (unless `fail-on-warn: true`)
+- `warn` — annotates PR and does not fail
 
 ## Trial mode
 
 `mode: audit` evaluates every policy and reports violations, but never fails the
-job. The default `mode: enforce` preserves normal severity and `fail-on-warn`
-behavior. A practical rollout is: generate, run in audit mode, inspect one real
-PR, switch to enforce, then require the check in branch protection.
+job. The default `mode: enforce` fails only `error` violations. A practical
+rollout is: generate, run in audit mode, inspect one real PR, switch to enforce,
+then change gradual-rollout policies from `warn` to `error` and require the check
+in branch protection.
 
 ---
 

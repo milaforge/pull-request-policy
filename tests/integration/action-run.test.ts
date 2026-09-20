@@ -17,7 +17,7 @@ describe('runAction', () => {
 
     await expect(
       runAction({
-        inputs: { failOnWarn: false, mode: 'enforce' },
+        inputs: { mode: 'enforce' },
         cwd: workspace,
         reporter: createReporter({ failures }),
         factsProvider: () => Promise.resolve(createFacts()),
@@ -43,7 +43,6 @@ policies:
     const result = await runAction({
       inputs: {
         configPath: path.join(workspace, '.github/pull-request-policy.yml'),
-        failOnWarn: false,
         mode: 'enforce',
       },
       reporter: createReporter({ failures }),
@@ -56,7 +55,7 @@ policies:
     );
   });
 
-  it('does not fail for warnings unless fail-on-warn is enabled', async () => {
+  it('does not fail for warnings in enforce mode', async () => {
     const workspace = await createWorkspaceWithConfig(`
 policies:
   api-change-needs-changelog:
@@ -74,7 +73,6 @@ policies:
     const result = await runAction({
       inputs: {
         configPath: path.join(workspace, '.github/pull-request-policy.yml'),
-        failOnWarn: false,
         mode: 'enforce',
       },
       reporter: createReporter({ failures, warnings }),
@@ -100,7 +98,6 @@ policies:
     const result = await runAction({
       inputs: {
         configPath: path.join(workspace, '.github/pull-request-policy.yml'),
-        failOnWarn: true,
         mode: 'audit',
       },
       reporter: createReporter({ failures }),

@@ -17,10 +17,6 @@ inputs:
     description: GitHub token used to read the base policy and pull request facts.
     required: false
     default: ${{ github.token }}
-  fail-on-warn:
-    description: Fail the job when warning policies are violated.
-    required: false
-    default: 'false'
   mode:
     description: audit reports violations without failing; enforce fails according to policy severity.
     required: false

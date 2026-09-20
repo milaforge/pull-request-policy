@@ -47,7 +47,8 @@ You can use another policy file by setting the `config-path` input.
 The action fails loudly when no configuration is found. Copy `.github/pull-request-policy.yml.sample` to your `.github/pull-request-policy.yml`, customize it for the repository, commit it, and open a new pull request.
 
 An existing configuration can still use `warn` policies for a gradual rollout.
-Warnings are reported without failing the job unless `fail-on-warn: true` is set.
+Warnings are reported without failing the job. Change a policy to `error` when it
+should block in enforce mode.
 
 ## Does it read the whole repository?
 
@@ -60,8 +61,7 @@ The action only reads repository data required by the active policies. For examp
 Policies have either `error` or `warn` severity.
 
 - `error` violations fail the GitHub Actions check.
-- `warn` violations are reported without failing the check by default.
-- Set `fail-on-warn: true` to make warnings fail the job.
+- `warn` violations are reported without failing the check.
 
 Violations are reported as pull request annotations.
 

@@ -8,7 +8,6 @@ export type GeneratorMode = 'quick-start' | 'advanced';
 
 export interface WorkflowOptions {
   actionRef: string;
-  failOnWarn: boolean;
   configPath: string;
   mode: 'audit' | 'enforce';
 }

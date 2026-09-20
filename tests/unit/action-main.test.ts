@@ -60,7 +60,7 @@ describe('main', () => {
     process.env['GITHUB_TOKEN'] = 'token';
     process.env['RUNNER_TEMP'] = '/tmp';
 
-    readInputs.mockReturnValue({ failOnWarn: false, mode: 'enforce' });
+    readInputs.mockReturnValue({ mode: 'enforce' });
     getOctokit.mockReturnValue({
       rest: {
         repos: {
@@ -120,7 +120,6 @@ describe('main', () => {
     readInputs.mockReturnValue({
       policy:
         'policies:\n  auth:\n    when:\n      changed: src/auth/**\n    approvals: 2\n',
-      failOnWarn: false,
       mode: 'audit',
     });
     const getContent = vi.fn();
@@ -156,7 +155,7 @@ describe('main', () => {
   });
 
   it('fails cleanly when no GitHub token is available', async () => {
-    readInputs.mockReturnValue({ failOnWarn: false, mode: 'enforce' });
+    readInputs.mockReturnValue({ mode: 'enforce' });
 
     const { main } = await import('../../src/action/main');
     await main();

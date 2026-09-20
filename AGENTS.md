@@ -61,8 +61,9 @@ If `.github/pull-request-policy.yml` is missing:
 - link to the Quick Start documentation.
 
 An existing configuration may use `severity: warn` for a gradual rollout. Warn
-policies do not fail CI unless `fail-on-warn: true`; this is the supported dry-run
-path for MVP and does not require a separate dry-run input.
+policies do not fail CI in enforce mode; change them to `error` when they should
+block. Audit mode reports violations without failing CI and does not require a
+separate dry-run input.
 
 ### Disallowed
 

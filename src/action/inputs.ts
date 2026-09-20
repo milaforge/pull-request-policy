@@ -4,7 +4,6 @@ export interface ActionInputs {
   policy?: string;
   configPath?: string;
   githubToken?: string;
-  failOnWarn: boolean;
   mode: 'audit' | 'enforce';
 }
 
@@ -20,7 +19,6 @@ export function readInputs(reader: InputReader = core): ActionInputs {
   const policy = normalize(reader.getInput('policy'));
   const githubToken = normalize(reader.getInput('github-token'));
   const inputs: ActionInputs = {
-    failOnWarn: readBooleanInput(reader.getInput('fail-on-warn')),
     mode: readModeInput(reader.getInput('mode')),
   };
   if (configPath !== undefined) {
@@ -37,10 +35,6 @@ export function readInputs(reader: InputReader = core): ActionInputs {
 
 function normalize(value: string): string | undefined {
   return value.trim().length === 0 ? undefined : value.trim();
-}
-
-function readBooleanInput(value: string): boolean {
-  return value.trim().toLowerCase() === 'true';
 }
 
 function readModeInput(value: string): 'audit' | 'enforce' {

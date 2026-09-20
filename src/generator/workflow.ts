@@ -28,15 +28,11 @@ export function generateWorkflowYaml(options: WorkflowOptions): string {
 
   if (
     options.mode !== 'enforce' ||
-    options.failOnWarn ||
     options.configPath !== '.github/pull-request-policy.yml'
   ) {
     appendLine(lines, 4, 'with:');
     if (options.configPath !== '.github/pull-request-policy.yml') {
       appendLine(lines, 5, `config-path: ${options.configPath}`);
-    }
-    if (options.failOnWarn) {
-      appendLine(lines, 5, 'fail-on-warn: true');
     }
     if (options.mode !== 'enforce') {
       appendLine(lines, 5, `mode: ${options.mode}`);

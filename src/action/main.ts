@@ -58,14 +58,7 @@ export async function runAction(
     `Policy summary: ${errorViolations} error violation(s), ${warningViolations} warning violation(s).`,
   );
 
-  if (
-    shouldFail(
-      errorViolations,
-      warningViolations,
-      dependencies.inputs.failOnWarn,
-      dependencies.inputs.mode,
-    )
-  ) {
+  if (shouldFail(errorViolations, dependencies.inputs.mode)) {
     dependencies.reporter.fail(createFailureMessage(evaluations));
   }
 
@@ -120,12 +113,10 @@ function reportEvaluations(
 
 function shouldFail(
   errorViolations: number,
-  warningViolations: number,
-  failOnWarn: boolean,
   mode: ActionInputs['mode'],
 ): boolean {
   if (mode === 'audit') return false;
-  return errorViolations > 0 || (failOnWarn && warningViolations > 0);
+  return errorViolations > 0;
 }
 
 function createFailureMessage(

@@ -70,8 +70,7 @@ A failed Action check becomes a merge gate only after you require the exact
 ruleset). See [Make it a merge gate](docs/quick-start.md#3-make-it-a-merge-gate).
 
 For a gradual rollout, use `severity: warn`; warnings are reported without
-failing the job unless `fail-on-warn: true`. Switch policies to `error` when
-you are ready to enforce them.
+failing the job. Switch policies to `error` when you are ready to enforce them.
 
 ## Troubleshooting
 

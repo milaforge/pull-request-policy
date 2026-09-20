@@ -10,7 +10,6 @@ describe('readInputs', () => {
           'config-path': ' .github/custom.yml ',
           policy: ' policies: []\n ',
           'github-token': ' secret ',
-          'fail-on-warn': 'true',
           mode: 'audit',
         };
         return values[name] ?? '';
@@ -21,7 +20,6 @@ describe('readInputs', () => {
       policy: 'policies: []',
       configPath: '.github/custom.yml',
       githubToken: 'secret',
-      failOnWarn: true,
       mode: 'audit',
     });
   });
@@ -32,13 +30,12 @@ describe('readInputs', () => {
         const values: Record<string, string> = {
           'config-path': ' ',
           'github-token': '',
-          'fail-on-warn': 'false',
         };
         return values[name] ?? '';
       },
     });
 
-    expect(inputs).toEqual({ failOnWarn: false, mode: 'enforce' });
+    expect(inputs).toEqual({ mode: 'enforce' });
   });
 
   it('reads an inline policy input', () => {
@@ -46,7 +43,7 @@ describe('readInputs', () => {
       readInputs({
         getInput: (name) => (name === 'policy' ? 'policies: []' : ''),
       }),
-    ).toEqual({ policy: 'policies: []', failOnWarn: false, mode: 'enforce' });
+    ).toEqual({ policy: 'policies: []', mode: 'enforce' });
   });
 
   it('rejects an unknown mode', () => {

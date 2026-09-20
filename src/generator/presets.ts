@@ -90,7 +90,6 @@ export const QUICK_START_PRESET_META: Record<
 export function createDefaultWorkflowOptions(): WorkflowOptions {
   return {
     actionRef: POLICY_ACTION_SHA,
-    failOnWarn: false,
     configPath: '.github/pull-request-policy.yml',
     mode: 'audit',
   };

@@ -9,8 +9,7 @@ The policy engine uses a YAML configuration file to define rules. By default, th
 | `policy`       | Optional inline YAML policy for quick starts. Takes precedence over `config-path`; not base-SHA protected. | empty                             |
 | `config-path`  | Optional repository-relative policy file path, read at the PR base SHA                                     | `.github/pull-request-policy.yml` |
 | `github-token` | GitHub token for reading the base policy and PR facts                                                      | `${{ github.token }}`             |
-| `fail-on-warn` | Whether to fail the job on warn violations                                                                 | `false`                           |
-| `mode`         | `audit` reports violations without failing; `enforce` applies failure rules                                | `enforce`                         |
+| `mode`         | `audit` reports violations without failing; `enforce` fails `error` violations                             | `enforce`                         |
 
 Use `mode: audit` while trialing policies on real pull requests, then switch to `mode: enforce`. To make the action a merge gate, protect the target branch and require this policy job’s status check. CODEOWNERS and code-owner review can separately protect the workflow and policy configuration. See [Quick Start](quick-start.md#3-make-it-a-merge-gate).
 
