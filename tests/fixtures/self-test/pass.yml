@@ -1,13 +1,9 @@
 policies:
-  - id: release-label-example
+  release-label-example:
     severity: warn
     when:
-      changed:
-        - 'api/public/**'
+      changed: 'api/public/**'
     require:
       any:
-        - has_label:
-            - 'release-note-exempt'
-        - changed:
-            - 'CHANGELOG.md'
-    message: 'Public API changes should include release-note evidence.'
+        - label: 'release-note-exempt'
+        - changed: 'CHANGELOG.md'

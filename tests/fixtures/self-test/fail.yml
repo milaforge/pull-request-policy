@@ -1,7 +1,5 @@
 policies:
-  - id: required-self-test-label
+  required-self-test-label:
     severity: error
     require:
-      has_label:
-        - 'pull-request-policy-self-test-required-label'
-    message: 'This fixture intentionally fails unless the special self-test label exists.'
+      label: 'pull-request-policy-self-test-required-label'
