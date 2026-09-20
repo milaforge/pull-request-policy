@@ -11,7 +11,7 @@ policies:
 
   non-empty-body:
     require:
-      body: '(?s).*\S.*'
+      body: '^(?:[\s\S]*\S){3}[\s\S]*$'
 
   lockfile-changes-need-changelog:
     when:
