@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { runAction } from '../../src/action/main';
 import type { ActionReporter } from '../../src/action/reporter';
+import type { PolicyEvaluation } from '../../src/engine/results';
 import { createFacts } from '../helpers/facts';
 
 describe('runAction', () => {
@@ -121,7 +122,14 @@ function createReporter(sink: {
     warning: (message) => sink.warnings?.push(message),
     error: (message) => sink.errors?.push(message),
     fail: (message) => sink.failures?.push(message),
-    annotate: () => undefined,
+    annotate: (evaluation: PolicyEvaluation) => {
+      const message = `[${evaluation.id}] ${evaluation.message}`;
+      if (evaluation.severity === 'warn') {
+        sink.warnings?.push(message);
+      } else {
+        sink.errors?.push(message);
+      }
+    },
     writeSummary: () => Promise.resolve(),
   };
 }
