@@ -2,6 +2,7 @@ name: self-test
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 permissions: {}
 

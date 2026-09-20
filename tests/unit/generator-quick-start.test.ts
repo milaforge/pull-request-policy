@@ -18,7 +18,9 @@ describe('quick start generator', () => {
     const yaml = generateWorkflowYaml(createDefaultGeneratorState().workflow);
 
     expect(yaml).toBe(`name: PR Policy
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
 jobs:
   policy:
     runs-on: ubuntu-latest

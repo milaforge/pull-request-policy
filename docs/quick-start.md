@@ -15,7 +15,9 @@ The inline `policy` input keeps this first experiment to one file:
 
 ```yaml
 name: PR Policy
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
   policy:
@@ -69,7 +71,9 @@ repository controls that make the result a merge gate.
 
 ```yaml
 name: PR Policy
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
   policy:

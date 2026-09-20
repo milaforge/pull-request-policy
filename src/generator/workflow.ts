@@ -8,7 +8,9 @@ function appendLine(lines: string[], level: number, value: string): void {
 export function generateWorkflowYaml(options: WorkflowOptions): string {
   const lines: string[] = [];
   appendLine(lines, 0, 'name: PR Policy');
-  appendLine(lines, 0, 'on: [pull_request]');
+  appendLine(lines, 0, 'on:');
+  appendLine(lines, 1, 'pull_request:');
+  appendLine(lines, 2, 'types: [opened, synchronize, reopened, edited]');
   appendLine(lines, 0, 'jobs:');
   appendLine(lines, 1, 'policy:');
   appendLine(lines, 2, 'runs-on: ubuntu-latest');

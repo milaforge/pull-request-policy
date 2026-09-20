@@ -14,7 +14,9 @@ For the fastest first run, keep the workflow and policy together:
 
 ```yaml
 name: PR Policy
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
   policy:
