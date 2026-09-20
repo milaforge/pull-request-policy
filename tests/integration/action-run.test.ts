@@ -52,7 +52,7 @@ policies:
 
     expect(result.errorViolations).toBe(1);
     expect(failures[0]).toMatch(
-      /queue-change-requires-tests.*requirement was not met/i,
+      /policy check failed: 1 error violation.*annotations above/i,
     );
   });
 
@@ -83,7 +83,7 @@ policies:
     expect(result.warningViolations).toBe(1);
     expect(failures).toEqual([]);
     expect(warnings[0]).toMatch(
-      /api-change-needs-changelog.*requirement was not met/i,
+      /Pull Request Policy warning:[\s\S]*- \[api-change-needs-changelog\]/i,
     );
   });
 

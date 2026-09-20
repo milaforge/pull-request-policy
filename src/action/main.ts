@@ -59,7 +59,7 @@ export async function runAction(
   );
 
   if (shouldFail(errorViolations, dependencies.inputs.mode)) {
-    dependencies.reporter.fail(createFailureMessage(evaluations));
+    dependencies.reporter.fail(createFailureMessage(errorViolations));
   }
 
   return {
@@ -100,8 +100,34 @@ function reportEvaluations(
   reporter: ActionReporter,
   evaluations: ReturnType<typeof evaluatePolicy>[],
 ): void {
-  for (const evaluation of evaluations.filter((e) => e.status === 'violated')) {
-    reporter.annotate(evaluation);
+  const violated = evaluations.filter((evaluation) => evaluation.status === 'violated');
+  reportViolations(reporter, violated, 'error');
+  reportViolations(reporter, violated, 'warn');
+}
+
+function reportViolations(
+  reporter: ActionReporter,
+  evaluations: ReturnType<typeof evaluatePolicy>[],
+  severity: 'error' | 'warn',
+): void {
+  const messages = evaluations
+    .filter((evaluation) => evaluation.severity === severity)
+    .map((evaluation) => `- [${evaluation.id}]`);
+  if (messages.length === 0) return;
+
+  const label = severity === 'error' ? 'violation' : 'warning';
+  const report = [
+    `Pull Request Policy ${label}:`,
+    '',
+    `The following requirements are not met by this PR:`,
+    '',
+    ...messages,
+  ].join('\n');
+
+  if (severity === 'error') {
+    reporter.error(report);
+  } else {
+    reporter.warning(report);
   }
 }
 
@@ -113,13 +139,8 @@ function shouldFail(
   return errorViolations > 0;
 }
 
-function createFailureMessage(
-  evaluations: ReturnType<typeof evaluatePolicy>[],
-): string {
-  return evaluations
-    .filter((e) => e.status === 'violated')
-    .map((e) => `[${e.id}] ${e.message}`)
-    .join('\n');
+function createFailureMessage(errorViolations: number): string {
+  return `Policy check failed: ${errorViolations} error violation(s). See the annotations above for details.`;
 }
 
 /**

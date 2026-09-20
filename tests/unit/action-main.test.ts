@@ -149,8 +149,7 @@ describe('main', () => {
     await main();
 
     expect(getContent).not.toHaveBeenCalled();
-    expect(reporter.annotate).toHaveBeenCalledOnce();
-    expect(reporter.error).not.toHaveBeenCalled();
+    expect(reporter.error).toHaveBeenCalledOnce();
   });
 
   it('reports each violated policy through annotations only once', async () => {
@@ -196,8 +195,10 @@ describe('main', () => {
       }),
     });
 
-    expect(reporter.annotate).toHaveBeenCalledTimes(2);
-    expect(reporter.error).not.toHaveBeenCalled();
+    expect(reporter.error).toHaveBeenCalledOnce();
+    expect(reporter.error).toHaveBeenCalledWith(
+      'Pull Request Policy violation:\n\nThe following requirements are not met by this PR:\n\n- [first-rule]\n- [second-rule]',
+    );
     expect(reporter.warning).not.toHaveBeenCalled();
   });
 
