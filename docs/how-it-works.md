@@ -55,7 +55,7 @@ Predicates compose with `all`, `any`, and `not`:
 require:
   any:
     - changed: ['CHANGELOG.md']
-    - has_label: ['skip-changelog']
+    - label: ['skip-changelog']
 ```
 
 ## Severity

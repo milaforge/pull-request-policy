@@ -30,15 +30,13 @@ describe('runAction', () => {
   it('fails the run when an error severity policy is violated', async () => {
     const workspace = await createWorkspaceWithConfig(`
 policies:
-  - id: queue-change-requires-tests
-    severity: error
+  queue-change-requires-tests:
     when:
       changed:
         - "runtime/queue/**"
     require:
       changed:
         - "tests/**"
-    message: Queue changes require tests.
 `);
     const failures: string[] = [];
 
@@ -53,13 +51,15 @@ policies:
     });
 
     expect(result.errorViolations).toBe(1);
-    expect(failures[0]).toMatch(/Queue changes require tests/i);
+    expect(failures[0]).toMatch(
+      /queue-change-requires-tests.*requirement was not met/i,
+    );
   });
 
   it('does not fail for warnings unless fail-on-warn is enabled', async () => {
     const workspace = await createWorkspaceWithConfig(`
 policies:
-  - id: api-change-needs-changelog
+  api-change-needs-changelog:
     severity: warn
     when:
       changed:
@@ -67,7 +67,6 @@ policies:
     require:
       changed:
         - "docs/release-notes/**"
-    message: API changes should include release-note evidence.
 `);
     const failures: string[] = [];
     const warnings: string[] = [];
@@ -85,18 +84,16 @@ policies:
     expect(result.warningViolations).toBe(1);
     expect(failures).toEqual([]);
     expect(warnings[0]).toMatch(
-      /API changes should include release-note evidence/i,
+      /api-change-needs-changelog.*requirement was not met/i,
     );
   });
 
   it('reports error violations without failing in audit mode', async () => {
     const workspace = await createWorkspaceWithConfig(`
 policies:
-  - id: required-tests
-    severity: error
+  required-tests:
     require:
       changed: tests/**
-    message: Tests are required.
 `);
     const failures: string[] = [];
 

@@ -66,8 +66,7 @@ policies:
   auth:
     when:
       changed: src/auth/**
-    require:
-      approvals: 2
+    approvals: 2
 
   title:
     require:
@@ -101,17 +100,15 @@ Use the GitHub account or team that should approve governance changes in place o
 
 ## Common patterns
 
-### Require tests when core code changes
+The compact map form is used for every policy.
 
 ```yaml
 policies:
-  - id: core-needs-tests
-    severity: error
+  core-needs-tests:
     when:
       changed: ['src/core/**', 'src/security/**']
     require:
       changed: ['tests/**']
-    message: 'Core or security changes must include tests.'
 ```
 
 ### Require extra trusted approvals for auth changes
@@ -128,30 +125,26 @@ policies:
 
 ```yaml
 policies:
-  - id: api-change-needs-changelog
-    severity: error
+  api-change-needs-changelog:
     when:
       changed: ['src/api/public/**']
     require:
       any:
         - changed: ['CHANGELOG.md']
-        - has_label: ['skip-changelog']
-    message: 'Public API changes must update CHANGELOG.md or carry skip-changelog label.'
+        - label: ['skip-changelog']
 ```
 
 ### Require rollout notes in PR body
 
 ```yaml
 policies:
-  - id: infra-needs-rollout-plan
-    severity: error
+  infra-needs-rollout-plan:
     when:
       changed: ['infra/**', 'deploy/**']
     require:
       body:
         - '(?i)rollout'
         - '(?i)rollback'
-    message: 'Infra changes must mention rollout and rollback in the PR body.'
 ```
 
 ---

@@ -67,7 +67,7 @@ Violations are reported as pull request annotations.
 
 ## Which approvals count?
 
-Only current approvals from reviewers with repository `write` or `admin` permission count toward `approval_count_at_least`. GitHub's `maintain` role is treated as `write`; read, triage, and unknown permissions do not count.
+Only current approvals from reviewers with repository `write` or `admin` permission count toward the compact `approvals` rule. GitHub's `maintain` role is treated as `write`; read, triage, and unknown permissions do not count.
 
 The action verifies each reviewer's repository permission through the GitHub API.
 If GitHub returns an unexpected error while checking permission, the action fails closed instead of treating the approval as trusted. A GitHub approval by itself is not equivalent to a trusted approval.
@@ -91,14 +91,15 @@ The action is intended to run on `pull_request` events. It requires a pull reque
 Yes.
 
 Use `all`, `any`, and `not` to combine predicates, and `when` to make a policy conditional.
+Use the compact map fields shown in the [Configuration Reference](configuration.md).
 
 For example:
 
 ```yaml
 require:
   all:
-    - approval_count_at_least: 2
-    - has_label:
+    - approvals: 2
+    - label:
         - security-review
 ```
 

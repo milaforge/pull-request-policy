@@ -273,7 +273,36 @@ export function normalizeAdvancedPolicies(
 }
 
 export function generatePolicyYaml(policies: Policy[]): string {
-  return dumpYaml({ policies });
+  const compactPolicies = Object.fromEntries(
+    policies.map((policy) => {
+      const output: Record<string, unknown> = {};
+      if (policy.description) output.description = policy.description;
+      if (policy.severity !== 'error') output.severity = policy.severity;
+      if (policy.when) output.when = compactExpression(policy.when);
+      if ('approval_count_at_least' in policy.require) {
+        output.approvals = policy.require.approval_count_at_least;
+      } else {
+        output.require = compactExpression(policy.require);
+      }
+      return [policy.id, output];
+    }),
+  );
+  return dumpYaml({ policies: compactPolicies });
+}
+
+function compactExpression(expression: Policy['require']): unknown {
+  if ('has_label' in expression) return { label: expression.has_label };
+  if ('approval_count_at_least' in expression) {
+    return { approvals: expression.approval_count_at_least };
+  }
+  if ('all' in expression || 'any' in expression) {
+    if ('all' in expression) {
+      return { all: expression.all.map(compactExpression) };
+    }
+    return { any: expression.any.map(compactExpression) };
+  }
+  if ('not' in expression) return { not: compactExpression(expression.not) };
+  return expression;
 }
 
 function generateInvalidPolicyYaml(errors: ValidationError[]): string {

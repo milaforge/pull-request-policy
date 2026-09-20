@@ -68,7 +68,7 @@ describe('main', () => {
             data: {
               type: 'file',
               encoding: 'base64',
-              content: Buffer.from('policies: []\n').toString('base64'),
+              content: Buffer.from('policies: {}\n').toString('base64'),
             },
           }),
           getBranchProtection: vi.fn().mockResolvedValue({

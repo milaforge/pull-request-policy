@@ -84,9 +84,7 @@ describe('PolicyGeneratorApp', () => {
     approvals.value = '3';
     approvals.dispatchEvent(new Event('change', { bubbles: true }));
 
-    expect(globalThis.document.body.textContent).toContain(
-      'approval_count_at_least: 3',
-    );
+    expect(globalThis.document.body.textContent).toContain('approvals: 3');
     expect(globalThis.document.body.textContent).toContain(
       'services/payments/**',
     );

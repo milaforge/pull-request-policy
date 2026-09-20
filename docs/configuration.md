@@ -16,45 +16,34 @@ Use `mode: audit` while trialing policies on real pull requests, then switch to 
 
 ## Root level
 
-| Key        | Type                     | Description                                                               |
-| :--------- | :----------------------- | :------------------------------------------------------------------------ |
-| `policies` | `Policy[]` or policy map | Policies to evaluate. The map form is the recommended user-facing syntax. |
+| Key        | Type       | Description                                            |
+| :--------- | :--------- | :----------------------------------------------------- |
+| `policies` | policy map | Policies to evaluate. The map key is each policy's ID. |
 
 ## Policy Shape
 
 Each policy defines when it applies and what it requires.
 
-The map form works for every predicate. The key becomes the policy ID, severity
-defaults to `error`, and the message is generated when omitted:
+Use the policy map syntax for new configuration. The key becomes the policy ID,
+severity defaults to `error`, and the message is generated automatically:
 
 ```yaml
 policies:
   auth:
     when:
       changed: src/auth/**
-    require:
-      approvals: 2
+    approvals: 2
 
   title:
     require:
       title: '^(feat|fix): .+'
 ```
 
-The policy name becomes its ID, severity defaults to `error`, and the action
-generates the message. Scalar strings are accepted wherever a predicate accepts
-strings; arrays remain supported. Multiple keys under `when` or `require` are
-combined with `all`. The map form can also specify `severity`, `description`,
-and `message` when needed.
-
-```yaml
-policies:
-  - id: string # Required. Unique identifier for the policy.
-    description: string # Optional. A human-readable description.
-    severity: error|warn # Required. 'error' fails the build; 'warn' only annotates (unless fail-on-warn is true).
-    when: predicate # Optional. Conditions that must be met for the policy to apply.
-    require: predicate # Required. The rule that must be satisfied.
-    message: string # Required. The message displayed when the policy is violated.
-```
+The supported compact fields are `when`, `changed`, `title`, `body`, `label`,
+`approvals`, and `file_contains`. Scalar strings are accepted wherever a
+predicate accepts strings; arrays remain supported. Add `severity` or
+`description` only when needed. Multiple conditions can be combined with
+`all`, `any`, and `not`.
 
 ## Predicates
 
@@ -100,23 +89,23 @@ title:
   - '^fix:'
 ```
 
-### `has_label`
+### `label`
 
 Checks if the pull request carries any of the specified labels.
 
 ```yaml
-has_label:
+label:
   - 'security-review'
   - 'deploy-safe'
 ```
 
-### `approval_count_at_least`
+### `approvals`
 
 Checks if the pull request has at least the specified number of approvals from reviewers with repository `write` or `admin` permission. Approvals from users with `read`, `triage`, or no repository permission do not count. GitHub maps
 the `maintain` base role to `write`, so maintainers count.
 
 ```yaml
-approval_count_at_least: 2
+approvals: 2
 ```
 
 If a reviewer permission cannot be verified, the action fails rather than counting that approval.
@@ -145,8 +134,8 @@ Passes only if **every** child predicate passes.
 ```yaml
 require:
   all:
-    - has_label: ['ready']
-    - approval_count_at_least: 1
+    - label: ['ready']
+    - approvals: 1
 ```
 
 ### `any`
@@ -156,8 +145,8 @@ Passes if **at least one** child predicate passes.
 ```yaml
 require:
   any:
-    - approval_count_at_least: 2
-    - has_label: ['fast-track']
+    - approvals: 2
+    - label: ['fast-track']
 ```
 
 ### `not`
@@ -167,7 +156,7 @@ Inverts the result of the child predicate.
 ```yaml
 when:
   not:
-    has_label: ['experimental']
+    label: ['experimental']
 ```
 
 ## Validation Rules

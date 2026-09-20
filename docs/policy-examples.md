@@ -1,77 +1,59 @@
 # Policy Examples
 
-If you are new to the action, start with the [Quick Start Tutorial](quick-start.md). It introduces the same building blocks in order, from the smallest rules to the most advanced combinations supported by the action.
+These examples use the compact map syntax. Start with the [Quick Start Tutorial](quick-start.md).
 
-## Required tests for changed files
+## Require tests for queue changes
 
 ```yaml
 policies:
-  - id: queue-change-requires-tests
-    severity: error
+  queue-change-requires-tests:
     when:
       changed:
         - 'runtime/queue/**'
         - 'runtime/store/**'
     require:
       any:
-        - changed:
-            - 'tests/**'
-        - changed:
-            - 'failure_modes/**'
-    message: 'Queue/store changes require tests or failure-mode updates.'
+        - changed: 'tests/**'
+        - changed: 'failure_modes/**'
 ```
 
-## Require changelog for API changes
+## Require a changelog or exemption label
 
 ```yaml
 policies:
-  - id: public-api-change-needs-changelog
+  public-api-change-needs-changelog:
     severity: warn
     when:
-      changed:
-        - 'api/public/**'
+      changed: 'api/public/**'
     require:
       any:
-        - changed:
-            - 'CHANGELOG.md'
-        - has_label:
-            - 'release-note-exempt'
-    message: 'Public API changes should include a changelog update or exemption label.'
+        - changed: 'CHANGELOG.md'
+        - label: 'release-note-exempt'
 ```
 
-## Require deploy label for workflow changes
+## Require a deploy label for workflow changes
 
 ```yaml
 policies:
-  - id: workflow-change-needs-label
+  workflow-change-needs-label:
     severity: warn
     when:
-      changed:
-        - '.github/workflows/**'
+      changed: '.github/workflows/**'
     require:
-      has_label:
-        - 'deploy-change'
-    message: 'Workflow changes should carry a deploy-change label.'
+      label: 'deploy-change'
 ```
 
-## Require docs for infra changes
+## Require rollout notes in the PR body
 
 ```yaml
 policies:
-  - id: infra-change-needs-docs
-    severity: error
+  infra-change-needs-rollout-plan:
     when:
       changed:
         - 'infra/**'
+        - 'deploy/**'
     require:
-      any:
-        - changed:
-            - 'docs/**'
-        - file_contains:
-            globs:
-              - 'docs/**/*.md'
-            patterns:
-              - 'rollback'
-              - 'runbook'
-    message: 'Infra changes require docs or runbook evidence.'
+      body:
+        - '(?i)rollout'
+        - '(?i)rollback'
 ```

@@ -6,20 +6,11 @@ import type {
 } from './schema';
 
 const TOP_LEVEL_KEYS = new Set(['policies']);
-const POLICY_KEYS = new Set([
-  'id',
-  'description',
-  'severity',
-  'when',
-  'require',
-  'message',
-]);
 const MAP_POLICY_KEYS = new Set([
   'description',
   'severity',
   'when',
   'require',
-  'message',
   'approvals',
 ]);
 const FILE_CONTAINS_KEYS = new Set(['globs', 'patterns']);
@@ -28,8 +19,8 @@ const PREDICATE_KEYS = [
   'exists',
   'body',
   'title',
-  'has_label',
-  'approval_count_at_least',
+  'label',
+  'approvals',
   'file_contains',
   'all',
   'any',
@@ -45,11 +36,6 @@ export function validateConfig(config: unknown): PolicyConfig {
 }
 
 function readPolicies(value: unknown): Policy[] {
-  if (Array.isArray(value)) {
-    return value.map((policy, index) =>
-      readPolicy(policy, `config.policies[${index}]`),
-    );
-  }
   const record = asRecord(value, 'config.policies');
   return Object.entries(record).map(([id, policy], index) =>
     readMapPolicy(id, policy, `config.policies.${id || index}`),
@@ -77,25 +63,23 @@ function readMapPolicy(id: string, value: unknown, scope: string): Policy {
     record['severity'] === undefined
       ? 'error'
       : readSeverity(record['severity'], `${scope}.severity`);
+  const approvalCount = isApprovalMap(requireValue)
+    ? readNonNegativeInteger(
+        (requireValue as Record<string, unknown>)['approvals'],
+        `${scope}.require.approvals`,
+      )
+    : undefined;
   const policy: Policy = {
     id: readNonEmptyString(id, `${scope} policy id`),
     severity,
     require,
     message:
-      readOptionalNonEmptyString(record['message'], `${scope}.message`) ??
-      `Policy "${id}" requirement was not met.`,
+      approvalCount !== undefined
+        ? `Policy "${id}" requires at least ${approvalCount} trusted approval${approvalCount === 1 ? '' : 's'}.`
+        : `Policy "${id}" requirement was not met.`,
   };
   if (when !== undefined) policy.when = when;
   if (description !== undefined) policy.description = description;
-  if (requireValue && isApprovalMap(requireValue)) {
-    const approvals = readNonNegativeInteger(
-      (requireValue as Record<string, unknown>)['approvals'],
-      `${scope}.require.approvals`,
-    );
-    if (record['message'] === undefined) {
-      policy.message = `Policy "${id}" requires at least ${approvals} trusted approval${approvals === 1 ? '' : 's'}.`;
-    }
-  }
   return policy;
 }
 
@@ -111,15 +95,9 @@ function readMapPredicate(value: unknown, scope: string): PredicateExpression {
   const entries = Object.entries(record);
   if (entries.length === 0) throw new Error(`${scope} must not be empty`);
   const predicates = entries.map(([key, predicateValue]) =>
-    readPredicate({ [normalizeMapPredicateKey(key)]: predicateValue }, scope),
+    readPredicate({ [key]: predicateValue }, scope),
   );
   return predicates.length === 1 ? predicates[0]! : { all: predicates };
-}
-
-function normalizeMapPredicateKey(key: string): string {
-  if (key === 'approvals') return 'approval_count_at_least';
-  if (key === 'label') return 'has_label';
-  return key;
 }
 
 function isApprovalMap(value: unknown): boolean {
@@ -129,44 +107,11 @@ function isApprovalMap(value: unknown): boolean {
   );
 }
 
-function readPolicy(value: unknown, scope: string): Policy {
-  const record = asRecord(value, scope);
-  rejectUnknownKeys(record, POLICY_KEYS, scope);
-  const description = readOptionalNonEmptyString(
-    record['description'],
-    `${scope}.description`,
-  );
-  const when = readOptionalPredicate(record['when'], `${scope}.when`);
-  const policy: Policy = {
-    id: readNonEmptyString(record['id'], `${scope}.id`),
-    severity: readSeverity(record['severity'], `${scope}.severity`),
-    require: readPredicate(record['require'], `${scope}.require`),
-    message: readNonEmptyString(record['message'], `${scope}.message`),
-  };
-  if (description !== undefined) {
-    policy.description = description;
-  }
-  if (when !== undefined) {
-    policy.when = when;
-  }
-  return policy;
-}
-
 function readSeverity(value: unknown, scope: string): Severity {
   if (value === 'error' || value === 'warn') {
     return value;
   }
   throw new Error(`${scope} must be "error" or "warn"`);
-}
-
-function readOptionalPredicate(
-  value: unknown,
-  scope: string,
-): PredicateExpression | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  return readPredicate(value, scope);
 }
 
 function readPredicate(value: unknown, scope: string): PredicateExpression {
@@ -190,15 +135,18 @@ function readPredicate(value: unknown, scope: string): PredicateExpression {
     case 'exists':
     case 'body':
     case 'title':
-    case 'has_label':
       return {
         [key]: readStringArray(predicateValue, `${scope}.${key}`),
       } as PredicateExpression;
-    case 'approval_count_at_least':
+    case 'label':
+      return {
+        has_label: readStringArray(predicateValue, `${scope}.${key}`),
+      };
+    case 'approvals':
       return {
         approval_count_at_least: readNonNegativeInteger(
           predicateValue,
-          `${scope}.approval_count_at_least`,
+          `${scope}.${key}`,
         ),
       };
     case 'file_contains':
