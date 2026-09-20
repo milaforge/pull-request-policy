@@ -6,7 +6,7 @@ on:
 permissions: {}
 
 jobs:
-  pass-case:
+  action-pass-case:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -29,7 +29,7 @@ jobs:
           github-token: ${{ github.token }}
           config-path: tests/fixtures/self-test/pass.yml
 
-  fail-case:
+  action-fail-case:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -53,14 +53,37 @@ jobs:
         with:
           github-token: ${{ github.token }}
           config-path: tests/fixtures/self-test/fail.yml
-      - if: steps.pull-request-policy.outcome != 'failure'
+      - if: steps.pull-request-policy-self-test.outcome != 'failure'
         run: |
           echo "Expected the failure self-test fixture to fail."
           exit 1
-      - id: pull-request-policy
-        continue-on-error: false
-        uses: ./
+
+  repository-policy:
+    name: Repository policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@9fd676a19091d4595eefd76e4bd31c97133911f1 # v4.2.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build:action
+
+      - uses: ./
         with:
           github-token: ${{ github.token }}
           config-path: .github/pull-request-policy.yml
-          mode: audit
+          mode: enforce

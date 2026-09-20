@@ -32,7 +32,7 @@
     "typecheck": "tsc --noEmit",
     "validate:example-config": "pnpm run compile && node scripts/validate-example-config.js",
     "validate": "pnpm run validate:example-config",
-    "check": "pnpm run lint:ci && pnpm run format:check && pnpm run typecheck && pnpm run test && pnpm run coverage && pnpm run build",
+    "check": "pnpm run lint:ci && pnpm run format:check && pnpm run typecheck && pnpm run test && pnpm run coverage && pnpm run validate && pnpm run build",
     "preview:site": "pnpm run build:site && node scripts/preview-site.mjs",
     "prepare": "pnpm run build"
   },

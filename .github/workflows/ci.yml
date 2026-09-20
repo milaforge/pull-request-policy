@@ -23,10 +23,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run lint:ci
-      - run: pnpm run typecheck
-      - run: pnpm run coverage
-      - run: pnpm run build
+      - run: pnpm run check
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
