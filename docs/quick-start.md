@@ -109,9 +109,16 @@ violations without failing. Inspect one real PR, then change the workflow to
 
 ### Make it a merge gate
 
-This is a repository-admin setup step. The Action can fail its workflow job, but a failed job is not automatically a merge restriction. For example, if a PR title violates the `severity: error` policy, GitHub will show the policy job as **failing** and annotate the PR. If the target branch has no rule requiring that job to pass, a user who has permission to merge can still click **Merge** (or merge through the API); the failure is informational rather than a gate.
+This is a repository-admin setup step. The Action fails its workflow job when an
+`error` policy is violated, but GitHub only turns that failure into a merge
+restriction when the target branch requires the check. For example, if a PR
+title violates the `severity: error` policy, GitHub will show the policy job as
+**failing** and annotate the PR. Once `PR Policy / policy` is required by a
+branch protection rule or ruleset, GitHub prevents the pull request from
+merging until the check passes. Without that requirement, a user who has
+permission to merge can still click **Merge** (or merge through the API).
 
-1. In **Settings → Rules**, protect the branch that receives PRs (for example, `main`) and require the exact `PR Policy / policy` status check, using the label GitHub presents after the first run. A failed check only blocks normal merges after GitHub requires that check; accounts or teams granted an explicit branch-rule bypass can still bypass it.
+1. In **Settings → Rules**, protect the branch that receives PRs (for example, `main`) and enable **Require status checks to pass before merging**. Select the exact `PR Policy / policy` status check, using the label GitHub presents after the first run. This is the setting that makes an error-policy failure prevent the PR from merging. Accounts or teams granted an explicit branch-rule bypass can still bypass it.
 2. Add `.github/CODEOWNERS`:
 
    ```text

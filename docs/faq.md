@@ -15,10 +15,11 @@ passing checks, required approvals, and restrictions on who can merge. CODEOWNER
 assigns review responsibility for protected paths. Pull Request Policy adds
 conditional rules that depend on the pull request's changed files and metadata.
 
-For example, branch protection can require the policy check to pass, CODEOWNERS can
-protect `.github/workflows/**`, and this action can require an additional label or
-approval count when those paths change. The action does not configure or replace
-any GitHub governance setting.
+For example, branch protection or a ruleset can require the `PR Policy / policy`
+check to pass, CODEOWNERS can protect `.github/workflows/**`, and this action can
+require an additional label or approval count when those paths change. When that
+status check is required, an `error` violation prevents the PR from merging; the
+action itself does not configure or replace any GitHub governance setting.
 
 ## Why is it a GitHub Action instead of a bot?
 
