@@ -10,7 +10,7 @@ GitHub App.
 
 ## Start with a policy
 
-[Open the policy generator](site/index.html) to choose protections and copy the
+[Open the policy generator](https://milaforge.github.io/pull-request-policy/) to choose protections and copy the
 workflow and policy files into your repository. For a manual starting point,
 add the action to a `pull_request` workflow, then create
 `.github/pull-request-policy.yml`:
