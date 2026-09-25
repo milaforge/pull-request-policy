@@ -1,5 +1,5 @@
 name: pull-request-policy
-description: Enforce conditional pull request policies in GitHub Actions using version-controlled YAML rules for changed files, approvals, labels, titles, descriptions, and required documentation.
+description: Enforce pull request policies with YAML rules for files, approvals, labels, titles, descriptions, and documentation.
 author: milaforge
 branding:
   icon: check-square
