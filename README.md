@@ -25,7 +25,7 @@ jobs:
       pull-requests: read
     runs-on: ubuntu-latest
     steps:
-      - uses: milaforge/pull-request-policy@v1
+      - uses: milaforge/pull-request-policy@aca1e55764b494ef7976ae6f64621fb3adb833de # v1
         with:
           mode: audit
           policy: |

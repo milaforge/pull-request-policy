@@ -28,7 +28,7 @@ jobs:
       contents: read
       pull-requests: read
     steps:
-      - uses: milaforge/pull-request-policy@025b7c153194f0712f91809bfada9fce35057c46 # v0.1-beta
+      - uses: milaforge/pull-request-policy@aca1e55764b494ef7976ae6f64621fb3adb833de # v1
         with:
           mode: audit
 `);
