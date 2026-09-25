@@ -122,8 +122,10 @@ branch protection rule or ruleset, GitHub prevents the pull request from
 merging until the check passes. Without that requirement, a user who has
 permission to merge can still click **Merge** (or merge through the API).
 
-1. In **Settings → Rules**, protect the branch that receives PRs (for example, `main`) and enable **Require status checks to pass before merging**. Select the exact `PR Policy / policy` status check, using the label GitHub presents after the first run. This is the setting that makes an error-policy failure prevent the PR from merging. Accounts or teams granted an explicit branch-rule bypass can still bypass it.
-2. Add `.github/CODEOWNERS`:
+1. Add and run the workflow first. Open a pull request so GitHub creates the `PR Policy / policy` check.
+2. As the final merge-gate setup step, go to **Settings → Rules → Rulesets**, create or edit the ruleset that targets the branch receiving PRs (for example, `main`), enable **Require status checks to pass**, choose **Add checks**, and select the exact check name **`PR Policy / policy`**. Save the ruleset. Selecting this check is what makes an `error`-policy failure prevent the PR from merging.
+3. Accounts or teams granted an explicit ruleset bypass can still bypass the requirement. Review the bypass list when this policy is part of a security or release control.
+4. Add `.github/CODEOWNERS`:
 
    ```text
    /.github/workflows/ @repo-owner
@@ -131,7 +133,7 @@ permission to merge can still click **Merge** (or merge through the API).
    /.github/CODEOWNERS @repo-owner
    ```
 
-3. In the same branch rule, enable **Require review from Code Owners**.
+5. In the same branch rule or ruleset, enable **Require review from Code Owners**.
 
 Use the GitHub account or team that should approve governance changes in place of `@repo-owner`. Public repositories can use these controls on GitHub Free. Private repositories still receive the action's base-SHA protection, but GitHub may require a paid plan to enforce branch protection and code-owner review.
 

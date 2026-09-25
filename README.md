@@ -79,7 +79,7 @@ failing the job. Switch policies to `error` when you are ready to enforce them.
 ## Troubleshooting
 
 - **No policy configuration found** — Copy `.github/pull-request-policy.yml.sample` to `.github/pull-request-policy.yml`, customize it, commit it, and open a new pull request.
-- **The check failed but the PR can still merge** — Require the exact `PR Policy / policy` status check in GitHub Rules.
+- **The check failed but the PR can still merge** — After the first workflow run, go to **Settings → Rules → Rulesets**, enable **Require status checks to pass**, choose **Add checks**, select the exact `PR Policy / policy` check, and save the ruleset.
 - **I want to trial the policy safely** — Set the workflow input to `mode: audit`. It reports violations without failing the job; switch to `mode: enforce` when the results are understood. Alternatively, use `severity: warn` for policies that should remain non-blocking while other policies enforce.
 - **An approval was not counted** — Only current approvals from trusted repository collaborators count. See [Which approvals count?](docs/faq.md#which-approvals-count).
 - **The action says it needs a pull request** — Use a `pull_request` workflow; push-only workflows are not supported in v1.
